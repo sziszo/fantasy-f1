@@ -26,5 +26,8 @@ app:
   show-stacktrace: true
 
 "%prod":
+  quarkus:
+    hibernate-orm:
+      sql-load-script: import.sql # temporarily
   app:
     show-stacktrace: false
