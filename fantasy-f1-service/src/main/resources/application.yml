@@ -1,0 +1,25 @@
+quarkus:
+  http:
+    port: 8080
+  swagger-ui:
+    always-include: true
+    path: /api
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}/${QUARKUS_TODO_DB:fantasy_f1}
+    driver: org.postgresql.Driver
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
+    max-size: 8
+    min-size: 2
+  hibernate-orm:
+    physical-naming-strategy: com.aklysoft.fantasyf1.service.core.orm.SnakeCaseNamingStrategy
+    database:
+      generation: drop-and-create
+  container-image:
+#    group: aklysoft
+    name: fantasy-f1-service
+    tag: 1.0.0-SNAPSHOT
+  kubernetes:
+    service-type: load-balancer
+
+
