@@ -22,4 +22,9 @@ quarkus:
   kubernetes:
     service-type: load-balancer
 
+app:
+  show-stacktrace: true
 
+"%prod":
+  app:
+    show-stacktrace: false
