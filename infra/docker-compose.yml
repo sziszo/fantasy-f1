@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  infra-db:
+    container_name: "infra-db"
+    image: infra-db:1.0.0
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES}
+
+  infra-prometheus:
+    image: prom/prometheus:latest
+    container_name: infra-prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  infra-grafana:
+    image: grafana/grafana
+    container_name: infra-grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/:/etc/grafana/provisioning/
+    depends_on:
+      - infra-prometheus
+
+networks:
+  default:
+    external:
+      name: fantasy_f1
