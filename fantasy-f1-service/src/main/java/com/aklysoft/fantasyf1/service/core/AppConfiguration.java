@@ -7,4 +7,6 @@ public class AppConfiguration {
 
   public String showStacktrace = "false";
 
+  public Integer downloadLimit = 30;
+
 }
