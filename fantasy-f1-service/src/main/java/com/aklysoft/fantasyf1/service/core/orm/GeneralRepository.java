@@ -9,7 +9,11 @@ public interface GeneralRepository<T, ID> {
 
   T findById(ID id);
 
+  boolean exists(ID id);
+
   List<T> findAll();
 
   void deleteById(ID id);
+
+  T update(T entity);
 }

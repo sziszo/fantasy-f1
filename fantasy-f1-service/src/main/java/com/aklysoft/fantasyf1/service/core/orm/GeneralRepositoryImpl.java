@@ -1,13 +1,16 @@
 package com.aklysoft.fantasyf1.service.core.orm;
 
+import lombok.Getter;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+@Getter
 public abstract class GeneralRepositoryImpl<T, ID> implements GeneralRepository<T, ID> {
 
   @PersistenceContext
-  private EntityManager entityManager;
+  protected EntityManager entityManager;
 
   private Class<T> entityClazz;
   private Class<ID> idClass;
@@ -20,6 +23,11 @@ public abstract class GeneralRepositoryImpl<T, ID> implements GeneralRepository<
   @Override
   public void persist(T entity) {
     entityManager.persist(entity);
+  }
+
+  @Override
+  public T update(T entity) {
+    return entityManager.merge(entity);
   }
 
   @Override
@@ -41,5 +49,10 @@ public abstract class GeneralRepositoryImpl<T, ID> implements GeneralRepository<
   public void deleteById(ID id) {
     T entity = findById(id);
     delete(entity);
+  }
+
+  @Override
+  public boolean exists(ID id) {
+    return findById(id) != null;
   }
 }
