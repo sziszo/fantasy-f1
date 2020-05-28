@@ -25,7 +25,8 @@ public final class SnakeCaseNamingStrategy implements PhysicalNamingStrategy {
 		if (!tableName.endsWith("s")) {
 			tableName = tableName.concat("s");
 		}
-		return Identifier.toIdentifier(tableName, name.isQuoted());
+
+		return toSnakeCase(Identifier.toIdentifier(tableName, name.isQuoted()));
 	}
 
 	@Override
