@@ -4,8 +4,10 @@ import com.aklysoft.fantasyf1.service.core.AppConfiguration;
 import com.aklysoft.fantasyf1.service.core.utils.StreamUtils;
 import com.aklysoft.fantasyf1.service.original.ErgastDownloaderService;
 import com.aklysoft.fantasyf1.service.original.OriginalService;
+import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorService;
 import com.aklysoft.fantasyf1.service.original.drivers.model.EDriver;
 import com.aklysoft.fantasyf1.service.original.drivers.model.EDriverData;
+import com.aklysoft.fantasyf1.service.original.drivers.model.EDriverTable;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +25,15 @@ public class OriginalDriverService extends OriginalService<OriginalDriver, Origi
 
   private final ErgastDownloaderService downloaderService;
   private final AppConfiguration appConfiguration;
+  private final OriginalConstructorService originalConstructorService;
 
   @Inject
-  public OriginalDriverService(OriginalDriverRepository originalDriverRepository,
-                               @RestClient ErgastDownloaderService downloaderService,
-                               AppConfiguration appConfiguration) {
+  public OriginalDriverService(OriginalDriverRepository originalDriverRepository, @RestClient ErgastDownloaderService downloaderService,
+                               AppConfiguration appConfiguration, OriginalConstructorService originalConstructorService) {
     super(originalDriverRepository);
     this.downloaderService = downloaderService;
     this.appConfiguration = appConfiguration;
+    this.originalConstructorService = originalConstructorService;
   }
 
   @Transactional
@@ -62,5 +65,34 @@ public class OriginalDriverService extends OriginalService<OriginalDriver, Origi
     );
   }
 
+
+  public OriginalDriver getDriver(String series, int season, String id) {
+    return originalRepository.findById(
+            OriginalDriverPK
+                    .builder()
+                    .series(series)
+                    .season(season)
+                    .id(id)
+                    .build()
+    );
+  }
+
+  @Transactional
+  public void linkConstructorsAndDrivers(String series, int year) {
+
+    originalConstructorService.getConstructors(series, year)
+            .stream()
+            .map(constructor -> downloaderService.getConstructorDrivers(series, year, constructor.getId()))
+            .map(resp -> resp.getData().getDriverTable())
+            .forEach(driverTable -> {
+              String constructorId = driverTable.getConstructorId();
+              driverTable.getDrivers()
+                      .stream()
+                      .map(EDriver::getDriverId)
+                      .map(driverId -> getDriver(series, year, driverId))
+                      .forEach(originalDriver -> originalDriver.setConstructorId(constructorId));
+            });
+
+  }
 
 }

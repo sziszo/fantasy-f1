@@ -1,7 +1,9 @@
 package com.aklysoft.fantasyf1.service.original.drivers;
 
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMember;
+import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.results.OriginalRaceResult;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,8 +42,21 @@ public class OriginalDriver {
 
   private String nationality;
 
-  @JsonBackReference
+  private String constructorId;
+
+  @ManyToOne
+  @JoinColumns({
+          @JoinColumn(name = "series", referencedColumnName = "series", insertable = false, updatable = false),
+          @JoinColumn(name = "season", referencedColumnName = "season", insertable = false, updatable = false),
+          @JoinColumn(name = "constructorId", referencedColumnName = "id", insertable = false, updatable = false)
+  })
+  private OriginalConstructor constructor;
+
+  @JsonIgnore
   @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
   private List<OriginalRaceResult> raceResults;
 
+  @JsonIgnore
+  @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
+  private List<FantasyTeamMember> fantasyTeamMembers;
 }

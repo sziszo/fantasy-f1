@@ -61,4 +61,16 @@ public class OriginalRaceService extends OriginalService<OriginalRace, OriginalR
             OriginalRaceMappers.originalRaceMapper
     );
   }
+
+
+  public OriginalRace getRace(String series, int season, int round) {
+    return originalRepository.findById(
+            OriginalRacePK
+                    .builder()
+                    .series(series)
+                    .season(season)
+                    .round(round)
+                    .build()
+    );
+  }
 }

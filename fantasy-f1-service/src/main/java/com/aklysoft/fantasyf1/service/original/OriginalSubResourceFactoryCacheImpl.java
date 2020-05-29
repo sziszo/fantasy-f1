@@ -32,7 +32,8 @@ public class OriginalSubResourceFactoryCacheImpl implements OriginalSubResourceF
 
   public OriginalSubResourceFactoryCacheImpl(OriginalRaceResourceFactory originalRaceResourceFactory,
                                              OriginalRaceResultResourceFactory originalRaceResultResourceFactory,
-                                             OriginalDriverResourceFactory originalDriverResourceFactory, OriginalConstructorResourceFactory originalConstructorResourceFactory) {
+                                             OriginalDriverResourceFactory originalDriverResourceFactory,
+                                             OriginalConstructorResourceFactory originalConstructorResourceFactory) {
     this.originalRaceResourceFactory = originalRaceResourceFactory;
     this.originalRaceResultResourceFactory = originalRaceResultResourceFactory;
     this.originalDriverResourceFactory = originalDriverResourceFactory;

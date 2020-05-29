@@ -62,5 +62,16 @@ public class OriginalConstructorService extends OriginalService<OriginalConstruc
     );
   }
 
+  public OriginalConstructor getConstructor(String series, int season, String id) {
+    return originalRepository.findById(
+            OriginalConstructorPK
+                    .builder()
+                    .series(series)
+                    .season(season)
+                    .id(id)
+                    .build()
+    );
+  }
+
 
 }
