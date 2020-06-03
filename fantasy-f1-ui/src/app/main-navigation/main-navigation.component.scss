@@ -1,0 +1,63 @@
+//.sidenav-container {
+//  height: 100%;
+//}
+//
+//.sidenav {
+//  width: 150px;
+//}
+//
+//.sidenav-icon-only {
+//  width: 75px;
+//}
+//
+//
+//.sidenav .mat-toolbar {
+//  background: inherit;
+//}
+//
+//.mat-toolbar.mat-primary {
+//  position: sticky;
+//  top: 0;
+//  z-index: 1;
+//}
+
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+:host > mat-sidenav-container.mat-sidenav-container  {
+  flex: 1;
+}
+
+/*
+ sidenav mini fix
+ 72px => 40px (button) + 16px(padding-left) + 16px(padding-right)
+*/
+.mat-drawer {
+  visibility: visible !important;
+  transform: translate3d(calc(72px - 100%) , 0,0);
+}
+.mat-drawer-content {
+  margin-left: 72px;
+}
+
+/* mat nav list items fix */
+.item { flex: 1; text-align: right}
+.mat-drawer.mat-drawer-opened .item {
+  text-align: left;
+}
+
+.footer {
+  bottom: 0;
+}
+
+.hcenter {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin-right: -50%;
+  text-align: center;
+}
