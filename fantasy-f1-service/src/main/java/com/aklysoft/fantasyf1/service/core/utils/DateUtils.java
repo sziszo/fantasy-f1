@@ -16,4 +16,15 @@ public class DateUtils {
     final ZoneId utc = ZoneId.of(ZoneOffset.UTC.getId());
     return LocalDateTime.ofInstant(Instant.parse(dateTimeString), utc);
   }
+
+  public static LocalDateTime toUtc(LocalDateTime localDateTime) {
+    return localDateTime
+            .atZone(ZoneId.systemDefault())
+            .withZoneSameInstant(ZoneId.of("UTC"))
+            .toLocalDateTime();
+  }
+
+  public static LocalDateTime getUtcNow() {
+    return LocalDateTime.now(ZoneId.of("UTC"));
+  }
 }

@@ -1,7 +1,7 @@
 package com.aklysoft.fantasyf1.service.original.races;
 
 import com.aklysoft.fantasyf1.service.original.results.OriginalRaceResult;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +31,7 @@ public class OriginalRace {
   private String raceName;
   private LocalDateTime date;
 
-  @JsonBackReference
+  @JsonIgnore
   @OneToMany(mappedBy = "race", cascade = CascadeType.ALL)
   private List<OriginalRaceResult> raceResults;
 

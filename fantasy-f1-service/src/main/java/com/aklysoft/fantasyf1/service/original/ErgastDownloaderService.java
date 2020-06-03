@@ -52,4 +52,10 @@ public interface ErgastDownloaderService {
   @Path("/{series}/{year}/constructors.json")
   EResponse<EConstructorData> getConstructors(@PathParam("series") String series, @PathParam("year") int year,
                                               @QueryParam("offset") int offset, @QueryParam("limit") int limit);
+
+  @GET
+  @Path("/{series}/{year}/constructors/{constructor}/drivers.json")
+  EResponse<EDriverData> getConstructorDrivers(@PathParam("series") String series, @PathParam("year") int year,
+                                    @PathParam("constructor") String constructor);
+
 }

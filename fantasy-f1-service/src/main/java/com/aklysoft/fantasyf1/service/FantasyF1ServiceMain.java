@@ -1,14 +1,21 @@
 package com.aklysoft.fantasyf1.service;
 
+import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
+import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorService;
+import com.aklysoft.fantasyf1.service.original.drivers.OriginalDriverService;
+import com.aklysoft.fantasyf1.service.original.races.OriginalRaceService;
 import com.aklysoft.fantasyf1.service.users.UserService;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.QuarkusMain;
+import io.quarkus.runtime.configuration.ProfileManager;
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.info.License;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
@@ -44,14 +51,39 @@ public class FantasyF1ServiceMain {
 
   @Singleton
   public static class Startup {
-    private final UserService userService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Startup.class);
 
-    public Startup(UserService userService) {
+    private final UserService userService;
+    private final FantasyDefinitionService fantasyDefinitionService;
+    private final OriginalRaceService originalRaceService;
+    private final OriginalConstructorService originalConstructorService;
+    private final OriginalDriverService originalDriverService;
+
+
+    public Startup(UserService userService, FantasyDefinitionService fantasyDefinitionService,
+                   OriginalRaceService originalRaceService, OriginalConstructorService originalConstructorService,
+                   OriginalDriverService originalDriverService) {
       this.userService = userService;
+      this.originalRaceService = originalRaceService;
+      this.fantasyDefinitionService = fantasyDefinitionService;
+      this.originalConstructorService = originalConstructorService;
+      this.originalDriverService = originalDriverService;
     }
 
     @Transactional
-    public void loadUsers(@Observes StartupEvent evt) {
+    public void startup(@Observes StartupEvent evt) {
+      LOGGER.info("The application is starting with profile " + ProfileManager.getActiveProfile());
+
+      if (!ProfileManager.getActiveProfile().equals("prod")) {
+        loadUsers();
+      }
+
+      if (ProfileManager.getActiveProfile().equals("dev")) {
+        loadCurrentSeason();
+      }
+    }
+
+    private void loadUsers() {
       // load all test users
       userService.addUser("admin", "admin", "admin");
       userService.addUser("user", "user", "user");
@@ -59,5 +91,15 @@ public class FantasyF1ServiceMain {
       userService.addUser("john", "john", "user");
       userService.addUser("charlie", "charlie", "user");
     }
+
+    private void loadCurrentSeason() {
+      final String series = "f1";
+      final Integer season = fantasyDefinitionService.getCurrentSeason(series);
+      originalRaceService.getRaces(series, season);
+      originalConstructorService.getConstructors(series, season);
+      originalDriverService.getDrivers(series, season);
+      originalDriverService.linkConstructorsAndDrivers(series, season);
+    }
+
   }
 }

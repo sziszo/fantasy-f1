@@ -4,6 +4,7 @@ import com.aklysoft.fantasyf1.service.core.AppConfiguration;
 import org.codehaus.plexus.util.ExceptionUtils;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -12,11 +13,8 @@ import javax.ws.rs.ext.Provider;
 @ApplicationScoped
 public class ApiExceptionHandler implements ExceptionMapper<ApiException> {
 
-  private final AppConfiguration appConfiguration;
-
-  public ApiExceptionHandler(AppConfiguration appConfiguration) {
-    this.appConfiguration = appConfiguration;
-  }
+  @Inject
+  AppConfiguration appConfiguration;
 
   @Override
   public Response toResponse(ApiException apiException) {

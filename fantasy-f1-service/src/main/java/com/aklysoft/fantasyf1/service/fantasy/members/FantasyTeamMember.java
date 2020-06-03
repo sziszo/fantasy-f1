@@ -1,5 +1,6 @@
-package com.aklysoft.fantasyf1.service.original.results;
+package com.aklysoft.fantasyf1.service.fantasy.members;
 
+import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeam;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.drivers.OriginalDriver;
 import com.aklysoft.fantasyf1.service.original.races.OriginalRace;
@@ -15,8 +16,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(OriginalRaceResultPK.class)
-public class OriginalRaceResult {
+@IdClass(FantasyTeamMemberPK.class)
+public class FantasyTeamMember {
+
+  @Id
+  private String userName;
 
   @Id
   private String series;
@@ -28,33 +32,38 @@ public class OriginalRaceResult {
   private int round;
 
   @Id
-  private int position;
-
-  private int number;
-  private String positionText;
-  private int points;
-
-  private int grid;
-  private int laps;
-  private String status;
+  @Enumerated(EnumType.STRING)
+  private FantasyTeamMemberTypeId teamMemberTypeId;
 
   private String driverId;
+
   private String constructorId;
 
   @ManyToOne
   @JoinColumns({
+          @JoinColumn(name = "userName", referencedColumnName = "userName", insertable = false, updatable = false),
+          @JoinColumn(name = "series", referencedColumnName = "series", insertable = false, updatable = false),
+          @JoinColumn(name = "season", referencedColumnName = "season", insertable = false, updatable = false)
+  })
+  private FantasyTeam team;
+
+  @OneToOne
+  @JoinColumns({
           @JoinColumn(name = "series", referencedColumnName = "series", insertable = false, updatable = false),
           @JoinColumn(name = "season", referencedColumnName = "season", insertable = false, updatable = false),
-          @JoinColumn(name = "round", referencedColumnName = "round", insertable = false, updatable = false)
+          @JoinColumn(name = "round", referencedColumnName = "round", insertable = false, updatable = false),
   })
   private OriginalRace race;
+
+  @ManyToOne
+  @JoinColumn(name = "teamMemberTypeId", insertable = false, updatable = false)
+  private FantasyTeamMemberType teamMemberType;
 
   @ManyToOne
   @JoinColumns({
           @JoinColumn(name = "series", referencedColumnName = "series", insertable = false, updatable = false),
           @JoinColumn(name = "season", referencedColumnName = "season", insertable = false, updatable = false),
           @JoinColumn(name = "driverId", referencedColumnName = "id", insertable = false, updatable = false)
-
   })
   private OriginalDriver driver;
 
@@ -65,6 +74,5 @@ public class OriginalRaceResult {
           @JoinColumn(name = "constructorId", referencedColumnName = "id", insertable = false, updatable = false)
   })
   private OriginalConstructor constructor;
-
 
 }

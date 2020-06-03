@@ -9,6 +9,7 @@ import java.util.List;
 public class EDriverTable {
 
   private int season;
+  private String constructorId;
 
   @JsonProperty("Drivers")
   private List<EDriver> drivers;

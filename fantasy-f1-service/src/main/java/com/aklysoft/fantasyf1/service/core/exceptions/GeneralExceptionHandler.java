@@ -4,6 +4,7 @@ import com.aklysoft.fantasyf1.service.core.AppConfiguration;
 import org.codehaus.plexus.util.ExceptionUtils;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -12,11 +13,12 @@ import javax.ws.rs.ext.Provider;
 @ApplicationScoped
 public class GeneralExceptionHandler implements ExceptionMapper<Exception> {
 
-  private final AppConfiguration appConfiguration;
+  @Inject
+  AppConfiguration appConfiguration;
 
-  public GeneralExceptionHandler(AppConfiguration appConfiguration) {
-    this.appConfiguration = appConfiguration;
-  }
+//  public GeneralExceptionHandler(AppConfiguration appConfiguration) {
+//    this.appConfiguration = appConfiguration;
+//  }
 
   @Override
   public Response toResponse(Exception exception) {

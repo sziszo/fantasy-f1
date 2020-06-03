@@ -92,11 +92,13 @@ public class OriginalRaceResultService extends OriginalService<OriginalRaceResul
 
       if (data.getDriver() != null) {
         OriginalDriver driver = originalDriverService.saveDriver(series, year, data.getDriver());
+        originalRaceResult.setDriverId(driver.getId());
         originalRaceResult.setDriver(driver);
       }
 
       if (data.getConstructor() != null) {
         OriginalConstructor constructor = originalConstructorService.saveConstructor(series, year, data.getConstructor());
+        originalRaceResult.setConstructorId(constructor.getId());
         originalRaceResult.setConstructor(constructor);
       }
 
