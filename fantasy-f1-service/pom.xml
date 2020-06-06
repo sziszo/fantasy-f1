@@ -114,6 +114,10 @@
       <scope>test</scope>
       <version>${jacoco.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-undertow</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -240,6 +244,30 @@
             <configuration>
               <dataFile>${project.build.directory}/jacoco.exec</dataFile>
               <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes/META-INF/resources/</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>../fantasy-f1-ui/dist/fantasy-f1-ui/</directory>
+                  <includes>
+                    <include>**/*.*</include>
+                  </includes>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>

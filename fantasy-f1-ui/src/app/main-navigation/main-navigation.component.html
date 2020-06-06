@@ -1,0 +1,71 @@
+<mat-toolbar color="primary">
+  <!--<button mat-icon-button (click)="opened = !opened">
+    <mat-icon mat-list-icon>menu</mat-icon>
+  </button>-->
+  <span>Fantasy-F1</span>
+
+  <div class="container" fxLayout="row" fxLayoutGap="1em" style="padding-left: 1em">
+
+    <app-series-selector></app-series-selector>
+    <app-season-selector></app-season-selector>
+
+  </div>
+</mat-toolbar>
+<mat-sidenav-container>
+  <mat-sidenav [opened]="opened" mode="side" [class.close]="!opened">
+    <mat-nav-list>
+      <mat-list-item routerLink="/home">
+        <div class="item">
+          <button mat-icon-button>
+            <mat-icon mat-list-icon>home</mat-icon>
+          </button>
+          <a *ngIf="opened">Home</a>
+        </div>
+      </mat-list-item>
+      <mat-list-item routerLink="/teams/my">
+        <div class="item">
+          <button mat-icon-button>
+            <mat-icon mat-list-icon>person</mat-icon>
+          </button>
+          <a *ngIf="opened">My Team</a>
+        </div>
+      </mat-list-item>
+      <mat-list-item routerLink="/teams">
+        <div class="item">
+          <button mat-icon-button>
+            <mat-icon mat-list-icon>person_search</mat-icon>
+          </button>
+          <a *ngIf="opened">Teams</a>
+        </div>
+      </mat-list-item>
+      <mat-list-item routerLink="/teams">
+        <div class="item">
+          <button mat-icon-button>
+            <mat-icon mat-list-icon>format_list_numbered</mat-icon>
+          </button>
+          <a *ngIf="opened">Leagues</a>
+        </div>
+      </mat-list-item>
+      <a mat-list-item (click)="opened=!opened" class="bottom">
+        <div class="item">
+          <button mat-icon-button>
+            <mat-icon>{{opened ? "arrow_back_ios" : "arrow_forward_ios"}}</mat-icon>
+          </button>
+          <a *ngIf="opened">Icons</a>
+          <!--<ng-container *ngIf="opened">
+            <div style="padding-left: 1em">{{opened ? "Ikonok" : ""}}</div>
+          </ng-container>-->
+        </div>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content [class.close]="!opened">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<mat-toolbar>
+  <div class=" hcenter">
+    &copy; Aklysoft Kft. 2020-{{year}}
+  </div>
+</mat-toolbar>

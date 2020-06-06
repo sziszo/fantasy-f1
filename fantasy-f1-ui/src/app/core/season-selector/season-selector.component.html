@@ -1,0 +1,6 @@
+<mat-form-field style="font-size: 16px">
+  <mat-label>Season</mat-label>
+  <mat-select [value]="selectedSeason" (selectionChange)="onSeasonChanged($event.value)">
+    <mat-option *ngFor="let s of seasonItems$|async" [value]="s.id">{{s.name}}</mat-option>
+  </mat-select>
+</mat-form-field>
