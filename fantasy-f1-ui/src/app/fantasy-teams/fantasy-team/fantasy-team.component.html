@@ -1,0 +1,41 @@
+<mat-card class="example-card">
+  <mat-card-header>
+    <div mat-card-avatar class="team-leader-avatar"></div>
+    <mat-card-title>{{team?.name}}</mat-card-title>
+    <mat-card-subtitle>{{team?.playerDisplayName}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+
+    <app-fantasy-team-members></app-fantasy-team-members>
+
+  </mat-card-content>
+</mat-card>
+
+<div fxLayout="row" fxLayoutAlign="space-around center">
+
+  <a mat-ripple [routerLink]="'results'" routerLinkActive="active">
+    <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="2%">
+      <div mat-card-avatar class="results-image"></div>
+      <div style="color: white">Results</div>
+    </div>
+  </a>
+
+  <a mat-ripple [routerLink]="'drivers'" routerLinkActive="active">
+    <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="2%">
+      <div mat-card-avatar class="drivers-image"></div>
+      <div style="color: white">Drivers</div>
+    </div>
+  </a>
+
+  <a mat-ripple [routerLink]="'constructors'" routerLinkActive="active">
+    <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="2%">
+      <div mat-card-avatar class="constructors-image"></div>
+      <div style="color: white">Constructors</div>
+    </div>
+  </a>
+</div>
+
+<router-outlet (activate)="onActivate($event)"></router-outlet>
+
+
+

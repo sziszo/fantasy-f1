@@ -1,6 +1,7 @@
 package com.aklysoft.fantasyf1.service.fantasy.teams;
 
 import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
+import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
 import com.aklysoft.fantasyf1.service.players.PlayerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,7 @@ class FantasyTeamServiceTest {
   @Mock
   private FantasyDefinitionService fantasyDefinitionService;
 
-  private final String series = "f1";
+  private final String series = FantasySeriesType.FORMULA_1.id;
   private final int season = 2019;
   private final int race = 1;
   private final String username = "user";

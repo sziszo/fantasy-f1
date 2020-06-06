@@ -1,5 +1,6 @@
 package com.aklysoft.fantasyf1.service.fantasy.members;
 
+import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamPK;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorNotExistException;
@@ -18,13 +19,16 @@ public class FantasyTeamMemberService {
   private final FantasyTeamMemberRepository fantasyTeamMemberRepository;
   private final OriginalConstructorService originalConstructorService;
   private final OriginalDriverService originalDriverService;
+  private final FantasyDefinitionService fantasyDefinitionService;
 
   public FantasyTeamMemberService(FantasyTeamMemberRepository fantasyTeamMemberRepository,
                                   OriginalConstructorService originalConstructorService,
-                                  OriginalDriverService originalDriverService) {
+                                  OriginalDriverService originalDriverService,
+                                  FantasyDefinitionService fantasyDefinitionService) {
     this.fantasyTeamMemberRepository = fantasyTeamMemberRepository;
     this.originalConstructorService = originalConstructorService;
     this.originalDriverService = originalDriverService;
+    this.fantasyDefinitionService = fantasyDefinitionService;
   }
 
 
@@ -39,7 +43,7 @@ public class FantasyTeamMemberService {
   }
 
   @Transactional
-  public FantasyTeamMember getFantasyTeamMember(FantasyTeamPK teamId, int race, FantasyTeamMemberTypeId teamMemberTypeId) {
+  public FantasyTeamMember getFantasyTeamMember(FantasyTeamPK teamId, int race, FantasyTeamMemberCategoryType teamMemberTypeId) {
     return fantasyTeamMemberRepository.findById(
             FantasyTeamMemberPK
                     .builder()
@@ -54,11 +58,14 @@ public class FantasyTeamMemberService {
   }
 
   @Transactional
-  public FantasyTeamMember setTeamMember(FantasyTeamPK teamId, ModifyFantasyTeamMember modifyFantasyTeamMember) {
+  public FantasyTeamMember setTeamMember(FantasyTeamPK teamId, Integer race, ModifyFantasyTeamMember modifyFantasyTeamMember) {
+    if (race == null) {
+      race = fantasyDefinitionService.getNextRace(teamId.getSeries(), teamId.getSeason());
+    }
 
-    final FantasyTeamMember fantasyTeamMember = getFantasyTeamMember(teamId, modifyFantasyTeamMember.getRace(), modifyFantasyTeamMember.getTeamMemberTypeId());
+    final FantasyTeamMember fantasyTeamMember = getFantasyTeamMember(teamId, race, modifyFantasyTeamMember.getTeamMemberTypeId());
     if (fantasyTeamMember == null) {
-      throw new FantasyTeamMemberNotExistException("FantasyTeamMember does not exist");
+      throw new FantasyTeamMemberNotExistException(modifyFantasyTeamMember.getTeamMemberTypeId());
     }
 
     if (fantasyTeamMember.getTeamMemberType().isConstructor()) {
@@ -68,7 +75,7 @@ public class FantasyTeamMemberService {
       }
 
       //check driver & constructor rules
-      if (!isValidConstructor(teamId, modifyFantasyTeamMember.getRace(), constructor)) {
+      if (!isValidConstructor(teamId, race, constructor)) {
         throw new InvalidFantasyTeamMemberException(constructor, teamId);
       }
 
@@ -81,7 +88,7 @@ public class FantasyTeamMemberService {
       }
 
       //check driver & constructor rules
-      if (!isValidDriver(teamId, modifyFantasyTeamMember.getRace(), driver)) {
+      if (!isValidDriver(teamId, race, driver)) {
         throw new InvalidFantasyTeamMemberException(driver, teamId);
       }
 
@@ -122,4 +129,24 @@ public class FantasyTeamMemberService {
     return isValidDriver && isValidConstructor(fantasyTeamMembers, driver.getConstructor());
   }
 
+  @Transactional
+  public FantasyTeamMember deleteTeamMember(FantasyTeamPK teamId, Integer race, FantasyTeamMemberCategoryType teamMemberCategoryType) {
+
+    if (race == null) {
+      race = fantasyDefinitionService.getNextRace(teamId.getSeries(), teamId.getSeason());
+    }
+
+    final FantasyTeamMember fantasyTeamMember = getFantasyTeamMember(teamId, race, teamMemberCategoryType);
+    if (fantasyTeamMember == null) {
+      throw new FantasyTeamMemberNotExistException(teamMemberCategoryType);
+    }
+
+    if (fantasyTeamMember.getTeamMemberType().isConstructor()) {
+      fantasyTeamMember.setConstructorId(null);
+    } else {
+      fantasyTeamMember.setDriverId(null);
+    }
+
+    return fantasyTeamMemberRepository.update(fantasyTeamMember);
+  }
 }

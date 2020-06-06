@@ -1,5 +1,6 @@
 package com.aklysoft.fantasyf1.service.fantasy.members;
 
+import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeam;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamPK;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
@@ -32,7 +33,7 @@ class FantasyTeamMemberRepositoryImplTest {
   EntityManager em;
 
   final FantasyTeamPK teamId = FantasyTeamPK.builder()
-          .series("f1")
+          .series(FantasySeriesType.FORMULA_1.id)
           .season(2020)
           .userName("user")
           .build();
@@ -78,7 +79,7 @@ class FantasyTeamMemberRepositoryImplTest {
     IntStream.range(1, 1 + raceCount)
             .boxed()
             .flatMap(round ->
-                    Stream.of(FantasyTeamMemberTypeId.values())
+                    Stream.of(FantasyTeamMemberCategoryType.values())
                             .map(typeId -> {
 
                               OriginalDriver driver = null;
@@ -130,7 +131,7 @@ class FantasyTeamMemberRepositoryImplTest {
 
     //then
     assertNotNull(result);
-    assertEquals(FantasyTeamMemberTypeId.values().length * raceCount, result.size());
+    assertEquals(FantasyTeamMemberCategoryType.values().length * raceCount, result.size());
   }
 
   @Test
@@ -145,7 +146,7 @@ class FantasyTeamMemberRepositoryImplTest {
 
     //then
     assertNotNull(result);
-    assertEquals(FantasyTeamMemberTypeId.values().length, result.size());
+    assertEquals(FantasyTeamMemberCategoryType.values().length, result.size());
   }
 
 

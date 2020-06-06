@@ -11,6 +11,8 @@ import { MatSortModule } from "@angular/material/sort";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from "@angular/material/select";
+import { MatRippleModule } from "@angular/material/core";
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
 
 
 
@@ -30,7 +32,12 @@ import { MatSelectModule } from "@angular/material/select";
     MatSortModule,
     MatFormFieldModule,
     MatCardModule,
-    MatSelectModule
+    MatSelectModule,
+    MatRippleModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatButtonToggleModule,
   ]
 })
 export class MaterialModule { }

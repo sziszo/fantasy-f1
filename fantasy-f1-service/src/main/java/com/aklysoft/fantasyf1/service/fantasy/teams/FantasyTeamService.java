@@ -3,12 +3,11 @@ package com.aklysoft.fantasyf1.service.fantasy.teams;
 import com.aklysoft.fantasyf1.service.core.utils.DateUtils;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
 import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMember;
-import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberTypeId;
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberCategoryType;
 import com.aklysoft.fantasyf1.service.players.PlayerService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,7 +63,7 @@ public class FantasyTeamService {
 
     int round = fantasyDefinitionService.getNextRace(series, season);
 
-    final List<FantasyTeamMember> teamMembers = Stream.of(FantasyTeamMemberTypeId.values())
+    final List<FantasyTeamMember> teamMembers = Stream.of(FantasyTeamMemberCategoryType.values())
             .map(teamMemberTypeId ->
                     FantasyTeamMember
                             .builder()

@@ -7,14 +7,18 @@ export const seasonItemsFeatureKey = 'seasonItems';
 
 export interface State extends EntityState<SeasonItem> {
   // additional entities state properties
-  selectedSeasonId: number
+  selectedSeasonId: string;
+  loading: boolean;
+  error: Error | null;
 }
 
 export const adapter: EntityAdapter<SeasonItem> = createEntityAdapter<SeasonItem>();
 
 export const initialState: State = adapter.getInitialState({
   // additional entity state properties
-  selectedSeasonId: null
+  selectedSeasonId: null,
+  loading: false,
+  error: null
 });
 
 
@@ -54,7 +58,21 @@ export const reducer = createReducer(
     (state, action) => {
       return {...state, selectedSeasonId: action.selectedSeasonItemId}
     }
-  )
+  ),
+  on(SeasonItemActions.searchSeasonItems, (state, action) => {
+    return {...state, loading: true, error: null}
+  }),
+  on(SeasonItemActions.searchSeasonItemsSuccess, (state, action) => {
+    return adapter.setAll(action.seasonItems, {
+      ...state,
+      loading: false,
+      error: null,
+      selectedSeasonId: action.selectedSeasonItemId
+    });
+  }),
+  on(SeasonItemActions.searchSeasonItemsFailure, (state, action) => {
+    return {...state, loading: false, error: action.error}
+  }),
 );
 
 

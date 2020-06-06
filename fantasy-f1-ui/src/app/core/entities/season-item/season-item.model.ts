@@ -1,4 +1,11 @@
 export interface SeasonItem {
-  id: number;
-  name: string;
+  id: string;
+  season: number;
+  series: string;
+}
+
+export interface FantasySeasonDefinitionItem {
+  series: string;
+  fantasySeasons: SeasonItem[];
+  selectedFantasySeasonId: string;
 }

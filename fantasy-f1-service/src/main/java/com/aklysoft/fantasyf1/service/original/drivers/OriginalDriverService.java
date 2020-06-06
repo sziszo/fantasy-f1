@@ -37,21 +37,21 @@ public class OriginalDriverService extends OriginalService<OriginalDriver, Origi
   }
 
   @Transactional
-  public List<OriginalDriver> getDrivers(String series, int year) {
+  public List<OriginalDriver> getDrivers(String series, int season) {
 
     Supplier<Stream<EDriver>> supplier = () -> {
-      LOGGER.info("downloading {} drivers of {} season", series, year);
-      final EDriverData firstData = downloaderService.getDrivers(series, year, 0, appConfiguration.downloadLimit).getData();
+      LOGGER.info("downloading {} drivers of {} season", series, season);
+      final EDriverData firstData = downloaderService.getDrivers(series, season, 0, appConfiguration.downloadLimit).getData();
 
       return Stream.concat(
               Stream.of(firstData),
               StreamUtils.repeat(firstData.getLimit(), appConfiguration.downloadLimit, firstData.getTotal(),
-                      offset -> downloaderService.getDrivers(series, year, offset, appConfiguration.downloadLimit).getData()))
+                      offset -> downloaderService.getDrivers(series, season, offset, appConfiguration.downloadLimit).getData()))
               .flatMap(data -> data.getDriverTable().getDrivers().stream());
     };
 
-    return super.getAllBySeason(series, year, supplier,
-            OriginalDriverMappers.getDriverIdMapper(series, year),
+    return super.getAllBySeason(series, season, supplier,
+            OriginalDriverMappers.getDriverIdMapper(series, season),
             OriginalDriverMappers.driverMapper
     );
   }

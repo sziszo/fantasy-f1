@@ -34,21 +34,21 @@ public class OriginalConstructorService extends OriginalService<OriginalConstruc
   }
 
   @Transactional
-  public List<OriginalConstructor> getConstructors(String series, int year) {
+  public List<OriginalConstructor> getConstructors(String series, int season) {
 
     Supplier<Stream<EConstructor>> supplier = () -> {
-      LOGGER.info("downloading {} constructors of {} season", series, year);
-      final EConstructorData firstData = downloaderService.getConstructors(series, year, 0, appConfiguration.downloadLimit).getData();
+      LOGGER.info("downloading {} constructors of {} season", series, season);
+      final EConstructorData firstData = downloaderService.getConstructors(series, season, 0, appConfiguration.downloadLimit).getData();
 
       return Stream.concat(
               Stream.of(firstData),
               StreamUtils.repeat(firstData.getLimit(), appConfiguration.downloadLimit, firstData.getTotal(),
-                      offset -> downloaderService.getConstructors(series, year, offset, appConfiguration.downloadLimit).getData()))
+                      offset -> downloaderService.getConstructors(series, season, offset, appConfiguration.downloadLimit).getData()))
               .flatMap(data -> data.getConstructorTable().getConstructors().stream());
     };
 
-    return super.getAllBySeason(series, year, supplier,
-            OriginalConstructorMappers.getConstructorIdMapper(series, year),
+    return super.getAllBySeason(series, season, supplier,
+            OriginalConstructorMappers.getConstructorIdMapper(series, season),
             OriginalConstructorMappers.constructorMapper
     );
   }

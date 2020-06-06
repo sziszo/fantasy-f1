@@ -1,0 +1,7 @@
+<div class="container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="2%">
+  <div *ngFor="let action of teamMemberActions">
+    <button (click)="onSelectionChanged(action.id)" style="background-color: transparent">
+      <div mat-card-avatar ngClass="{{action.icon}}"></div>
+    </button>
+  </div>
+</div>

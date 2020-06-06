@@ -3,6 +3,8 @@ package com.aklysoft.fantasyf1.service.fantasy.definitions;
 import com.aklysoft.fantasyf1.service.core.orm.GeneralRepositoryImpl;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.persistence.NoResultException;
+import java.util.List;
 
 @ApplicationScoped
 public class FantasyDefinitionRepositoryImpl extends GeneralRepositoryImpl<FantasyDefinition, FantasyDefinitionPK> implements FantasyDefinitionRepository {
@@ -20,9 +22,20 @@ public class FantasyDefinitionRepositoryImpl extends GeneralRepositoryImpl<Fanta
 
   @Override
   public Integer getNextRace(String series, int season) {
-    return entityManager.createQuery("select d.nextRace from FantasyDefinition d where d.series = ?1 and d.season = ?2", Integer.class)
+    try {
+      return entityManager.createQuery("select d.nextRace from FantasyDefinition d where d.series = ?1 and d.season = ?2", Integer.class)
+              .setParameter(1, series)
+              .setParameter(2, season)
+              .getSingleResult();
+    } catch (NoResultException ex) {
+      return null;
+    }
+  }
+
+  @Override
+  public List<Integer> getSeasons(String series) {
+    return entityManager.createQuery("select distinct d.season from FantasyDefinition d where d.series = ?1", Integer.class)
             .setParameter(1, series)
-            .setParameter(2, season)
-            .getSingleResult();
+            .getResultList();
   }
 }
