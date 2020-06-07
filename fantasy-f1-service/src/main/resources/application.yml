@@ -5,7 +5,7 @@ quarkus:
     always-include: true
     path: /api
   datasource:
-    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}/${QUARKUS_TODO_DB:fantasy_f1}
+    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}/${FANTASY_F1_DB:fantasy_f1}
     driver: org.postgresql.Driver
     username: ${POSTGRES_USER:admin}
     password: ${POSTGRES_PASSWORD:admin}
@@ -15,6 +15,7 @@ quarkus:
     physical-naming-strategy: com.aklysoft.fantasyf1.service.core.orm.SnakeCaseNamingStrategy
     database:
       generation: drop-and-create
+    sql-load-script: import.sql
     log:
       sql: false
   container-image:
@@ -27,6 +28,15 @@ quarkus:
 app:
   download-limit: 50
   show-stacktrace: true
+
+"%test":
+  quarkus:
+    datasource:
+      url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}/${FANTASY_F1_TEST_DB:fantasy_f1_test}
+    hibernate-orm:
+      database:
+        generation: drop-and-create
+      sql-load-script: import_test.sql
 
 "%prod":
   quarkus:
