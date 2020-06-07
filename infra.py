@@ -13,7 +13,7 @@ from globals import DEFAULT_LOG_FOLDER
 
 ENV_FILE = '.env'
 
-DATABASES = ['fantasy_f1']
+DATABASES = ['fantasy_f1', 'fantasy_f1_test']
 DATABASE_HOST = 'infra-db'
 
 # docker
