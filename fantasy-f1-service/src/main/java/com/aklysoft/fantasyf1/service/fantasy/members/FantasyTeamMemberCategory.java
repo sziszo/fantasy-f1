@@ -14,15 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class FantasyTeamMemberType {
+@Table(name = "fantasy_team_member_categories")
+public class FantasyTeamMemberCategory {
 
   @Id
   @Enumerated(EnumType.STRING)
-  private FantasyTeamMemberTypeId id;
+  private FantasyTeamMemberCategoryType id;
 
   private String name;
 
   private boolean isConstructor;
+
+  private int sortOrder;
 
   @JsonIgnore
   @OneToMany(mappedBy = "teamMemberType", cascade = CascadeType.ALL)

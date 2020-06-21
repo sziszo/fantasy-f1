@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ModifyFantasyTeamMember {
 
-  private int race;
-  private FantasyTeamMemberTypeId teamMemberTypeId;
+  private FantasyTeamMemberCategoryType teamMemberTypeId;
 
   private String id;  //driverId or constructorId
 }

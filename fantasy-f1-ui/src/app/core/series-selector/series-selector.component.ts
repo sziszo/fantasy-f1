@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Observable } from "rxjs";
 import { SeriesItem } from "../entities/series-item/series-item.model";
 import { Store } from "@ngrx/store";
-import { getSelectedSeriesId, selectAllSeriesItems } from "../entities/series-item/series-item.selector";
-import { loadSeriesItems, setSelectedSeriesItem } from "../entities/series-item/series-item.actions";
+import { selectAllSeriesItems } from "../entities/series-item/series-item.selector";
+import { loadSeriesItems, searchSeriesItems } from "../entities/series-item/series-item.actions";
 
 @Component({
   selector: 'app-series-selector',
@@ -12,32 +12,38 @@ import { loadSeriesItems, setSelectedSeriesItem } from "../entities/series-item/
 })
 export class SeriesSelectorComponent implements OnInit {
 
+  @Output()
+  selectionChange = new EventEmitter<string>();
+
+  @Input()
+  selectedSeries;
+
   seriesItems$: Observable<SeriesItem[]>;
-  selectedSeries = '';
 
   constructor(private store: Store) {
     this.seriesItems$ = store.select(selectAllSeriesItems)
-
-    this.store
-      .select(getSelectedSeriesId)
-      .subscribe(value => this.selectedSeries = value)
-
   }
 
   ngOnInit(): void {
 
-    this.store.dispatch(loadSeriesItems({
-      seriesItems: [
-        {id: "f1", name: "Formula 1"},
-        {id: "fe", name: "Formula E"}
-      ]
-    }))
+    this.store.dispatch(searchSeriesItems());
 
-    this.onSeriesChanged('f1');
+    // this.store.dispatch(loadSeriesItems({
+    //   seriesItems: [
+    //     {id: "f1", name: "Formula 1"},
+    //     {id: "fe", name: "Formula E"}
+    //   ]
+    // }))
+    //
+    // if (!this.selectedSeries) {
+    //   this.selectedSeries = 'f1';
+    // }
+    // this.onSelectionChanged(this.selectedSeries);
   }
 
-  onSeriesChanged(seriesItemId: string) {
-    this.store.dispatch(setSelectedSeriesItem({selectedSeriesItemId: seriesItemId}))
+  onSelectionChanged(seriesItemId: string) {
+    this.selectionChange.emit(seriesItemId)
+    // this.store.dispatch(setSelectedSeriesItem({selectedSeriesItemId: seriesItemId}))
   }
 
 }

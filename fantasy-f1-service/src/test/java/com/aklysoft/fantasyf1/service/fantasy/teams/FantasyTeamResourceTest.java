@@ -1,5 +1,6 @@
 package com.aklysoft.fantasyf1.service.fantasy.teams;
 
+import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.http.ContentType;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamMappers.toFantasyTeamViewItem;
 import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +24,7 @@ class FantasyTeamResourceTest {
   @InjectMock
   FantasyTeamService fantasyTeamService;
 
-  private final String series = "f1";
+  private final String series = FantasySeriesType.FORMULA_1.id;
   private final int season = 2019;
 
   private final String user1 = "user";
@@ -42,7 +44,7 @@ class FantasyTeamResourceTest {
     when(fantasyTeamService.getAllFantasyTeams(series, season)).thenReturn(fantasyTeams);
 
     //when
-    final List<FantasyTeam> result = given()
+    final List<FantasyTeamViewItem> result = given()
             .when()
             .get("/api/v1/fantasy/{series}/teams/{season}/all", Map.of("series", series, "season", season))
             .then()
@@ -50,22 +52,22 @@ class FantasyTeamResourceTest {
             .extract()
             .body()
             .jsonPath()
-            .getList(".", FantasyTeam.class);
+            .getList(".", FantasyTeamViewItem.class);
 
     assertNotNull(result);
-    assertEquals(fantasyTeams, result);
+    assertEquals(toFantasyTeamViewItem(fantasyTeams), result);
 
     verify(fantasyTeamService).getAllFantasyTeams(series, season);
   }
 
   @Test
-  public void shouldGetMineFantasyTeams() {
+  public void shouldGetMineFantasyTeam() {
 
     final FantasyTeam fantasyTeam = FantasyTeam.builder().series(series).season(season).userName(user1).name("User1F1Team").build();
     when(fantasyTeamService.getFantasyTeam(series, season, user1)).thenReturn(fantasyTeam);
 
     //when
-    final FantasyTeam result = given()
+    final FantasyTeamViewItem result = given()
             .auth().basic(user1, user1)
             .when()
             .get("/api/v1/fantasy/{series}/teams/{season}", Map.of("series", series, "season", season))
@@ -73,10 +75,10 @@ class FantasyTeamResourceTest {
             .statusCode(200)
             .extract()
             .body()
-            .as(FantasyTeam.class);
+            .as(FantasyTeamViewItem.class);
 
     assertNotNull(result);
-    assertEquals(fantasyTeam, result);
+    assertEquals(toFantasyTeamViewItem(fantasyTeam), result);
 
     verify(fantasyTeamService).getFantasyTeam(series, season, user1);
   }
@@ -91,7 +93,7 @@ class FantasyTeamResourceTest {
     final FantasyTeam result = given()
             .auth().basic(admin, admin)
             .when()
-            .get("/api/v1/fantasy/{series}/teams/{season}/{username}",
+            .get("/api/v1/fantasy/{series}/teams/{season}/admin/{username}",
                     Map.of("series", series, "season", season, "username", user1))
             .then()
             .statusCode(200)
@@ -111,7 +113,7 @@ class FantasyTeamResourceTest {
     given()
             .auth().basic(user1, user1)
             .when()
-            .get("/api/v1/fantasy/{series}/teams/{season}/{username}",
+            .get("/api/v1/fantasy/{series}/teams/{season}/admin/{username}",
                     Map.of("series", series, "season", season, "username", user2))
             .then()
             .statusCode(403);
@@ -194,7 +196,7 @@ class FantasyTeamResourceTest {
             .contentType(ContentType.JSON)
             .body(teamName)
             .when()
-            .put("/api/v1/fantasy/{series}/teams/{season}/{username}",
+            .put("/api/v1/fantasy/{series}/teams/{season}/admin/{username}",
                     Map.of("series", this.series, "season", season, "username", user1))
             .then()
             .assertThat()
@@ -220,7 +222,7 @@ class FantasyTeamResourceTest {
             .contentType(ContentType.JSON)
             .body(teamName)
             .when()
-            .put("/api/v1/fantasy/{series}/teams/{season}/{username}",
+            .put("/api/v1/fantasy/{series}/teams/{season}/admin/{username}",
                     Map.of("series", this.series, "season", season, "username", user2))
             .then()
             .assertThat()
@@ -303,7 +305,7 @@ class FantasyTeamResourceTest {
             .contentType(ContentType.JSON)
             .body(teamName)
             .when()
-            .post("/api/v1/fantasy/{series}/teams/{season}/{username}",
+            .post("/api/v1/fantasy/{series}/teams/{season}/admin/{username}",
                     Map.of("series", this.series, "season", season, "username", user1))
             .then()
             .assertThat()
@@ -329,7 +331,7 @@ class FantasyTeamResourceTest {
             .contentType(ContentType.JSON)
             .body(teamName)
             .when()
-            .post("/api/v1/fantasy/{series}/teams/{season}/{username}",
+            .post("/api/v1/fantasy/{series}/teams/{season}/admin/{username}",
                     Map.of("series", this.series, "season", season, "username", user2))
             .then()
             .assertThat()

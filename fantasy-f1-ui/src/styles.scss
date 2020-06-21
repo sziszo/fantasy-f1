@@ -1,4 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+//@import '@angular/material/prebuilt-themes/purple-green.css';
+//@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.engine-image {
+  //background-image: url('/assets/images/helmet_blue.png');
+  background-image: url('/assets/images/engine_grey.png');
+  background-size: cover;
+}
+
+.driver-image {
+  background-image: url('/assets/images/helmet_grey.png');
+  background-size: cover;
+}
+
+.body-image {
+  background-image: url('/assets/images/battery_grey.png');
+  background-size: cover;
+}
+
+.staff-image {
+  background-image: url('/assets/images/tyre_grey.png');
+  background-size: cover;
+}

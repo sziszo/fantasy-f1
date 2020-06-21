@@ -17,6 +17,6 @@ public class FantasyTeamMemberPK implements Serializable {
   private String series;
   private int season;
   private int round;
-  private FantasyTeamMemberTypeId teamMemberTypeId;
+  private FantasyTeamMemberCategoryType teamMemberTypeId;
 
 }

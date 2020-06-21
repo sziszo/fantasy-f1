@@ -1,5 +1,5 @@
 <mat-form-field style="font-size: 16px">
-  <mat-select [value]="selectedSeries" (selectionChange)="onSeriesChanged($event.value)">
+  <mat-select [value]="selectedSeries" (selectionChange)="onSelectionChanged($event.value)">
     <mat-option *ngFor="let item of seriesItems$|async" [value]="item.id">{{item.name}}</mat-option>
   </mat-select>
   <mat-label>Series</mat-label>

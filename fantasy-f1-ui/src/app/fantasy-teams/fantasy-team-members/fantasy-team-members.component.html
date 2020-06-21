@@ -1,0 +1,30 @@
+<div class="container" fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="2%">
+  <div fxFlex.gt-md="30%" *ngFor="let member of teamMembers$ | async" style="padding-top: 1em;">
+    <mat-card>
+      <mat-card-header>
+        <div mat-card-avatar ngClass="{{getImageClass(member.teamMemberTypeId)}}"></div>
+        <mat-card-title>
+          {{member.teamMemberName || "Unknown"}}
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{member.teamMemberCategoryName}}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+      </mat-card-content>
+      <mat-card-actions>
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+
+          <button mat-icon-button routerLink="{{getTeamMemberSelectorUrl(member.teamMemberTypeId)}}">
+            <mat-icon mat-list-icon>add</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteTeamMember(member.teamMemberTypeId)">
+            <mat-icon mat-list-icon>delete</mat-icon>
+          </button>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+</div>

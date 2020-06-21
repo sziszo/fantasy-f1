@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
+import static com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorMappers.toOriginalConstructorViewItems;
+
 @Produces(MediaType.APPLICATION_JSON)
 public class OriginalConstructorResource implements OriginalSubResource {
 
@@ -21,9 +23,9 @@ public class OriginalConstructorResource implements OriginalSubResource {
   }
 
   @GET
-  @Path("/{year}")
-  public List<OriginalConstructor> getConstructors(@PathParam("year") int year) {
-    return originalConstructorService.getConstructors(series, year);
+  @Path("/{season}")
+  public List<OriginalConstructorVIewItem> getConstructors(@PathParam("season") int season) {
+    return toOriginalConstructorViewItems(originalConstructorService.getConstructors(series, season));
   }
 
 }

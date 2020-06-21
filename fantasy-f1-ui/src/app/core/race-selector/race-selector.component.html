@@ -1,0 +1,6 @@
+<mat-form-field style="font-size: 16px">
+  <mat-label>Race</mat-label>
+  <mat-select [value]="selectedRace" (selectionChange)="onSelectionChanged($event.value)">
+    <mat-option *ngFor="let s of raceItems$|async" [value]="s.id">{{s.name}}</mat-option>
+  </mat-select>
+</mat-form-field>

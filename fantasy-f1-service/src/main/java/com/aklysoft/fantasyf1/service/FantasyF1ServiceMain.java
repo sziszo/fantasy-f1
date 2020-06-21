@@ -1,6 +1,8 @@
 package com.aklysoft.fantasyf1.service;
 
 import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
+import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamService;
+import com.aklysoft.fantasyf1.service.fantasy.teams.NewFantasyTeam;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorService;
 import com.aklysoft.fantasyf1.service.original.drivers.OriginalDriverService;
 import com.aklysoft.fantasyf1.service.original.races.OriginalRaceService;
@@ -58,28 +60,35 @@ public class FantasyF1ServiceMain {
     private final OriginalRaceService originalRaceService;
     private final OriginalConstructorService originalConstructorService;
     private final OriginalDriverService originalDriverService;
+    private final FantasyTeamService fantasyTeamService;
 
 
     public Startup(UserService userService, FantasyDefinitionService fantasyDefinitionService,
                    OriginalRaceService originalRaceService, OriginalConstructorService originalConstructorService,
-                   OriginalDriverService originalDriverService) {
+                   OriginalDriverService originalDriverService, FantasyTeamService fantasyTeamService) {
       this.userService = userService;
       this.originalRaceService = originalRaceService;
       this.fantasyDefinitionService = fantasyDefinitionService;
       this.originalConstructorService = originalConstructorService;
       this.originalDriverService = originalDriverService;
+      this.fantasyTeamService = fantasyTeamService;
     }
 
     @Transactional
     public void startup(@Observes StartupEvent evt) {
       LOGGER.info("The application is starting with profile " + ProfileManager.getActiveProfile());
 
-      if (!ProfileManager.getActiveProfile().equals("prod")) {
-        loadUsers();
-      }
+      loadUsers();
+//      if (!ProfileManager.getActiveProfile().equals("prod")) {
+//        loadUsers();
+//      }
 
       if (ProfileManager.getActiveProfile().equals("dev")) {
-        loadCurrentSeason();
+        final String series = "f1";
+        final Integer season = fantasyDefinitionService.getCurrentSeason(series);
+
+        loadCurrentSeason(series, season);
+        createTestFantasyTeam(series, season);
       }
     }
 
@@ -92,13 +101,24 @@ public class FantasyF1ServiceMain {
       userService.addUser("charlie", "charlie", "user");
     }
 
-    private void loadCurrentSeason() {
-      final String series = "f1";
-      final Integer season = fantasyDefinitionService.getCurrentSeason(series);
+    private void loadCurrentSeason(String series, int season) {
       originalRaceService.getRaces(series, season);
       originalConstructorService.getConstructors(series, season);
       originalDriverService.getDrivers(series, season);
       originalDriverService.linkConstructorsAndDrivers(series, season);
+    }
+
+    private void createTestFantasyTeam(String series, int season) {
+      fantasyTeamService.createFantasyTeam(
+              NewFantasyTeam
+                      .builder()
+                      .series(series)
+                      .season(season)
+                      .username("user")
+                      .creator("admin")
+                      .name("TestF1Team")
+                      .build()
+      );
     }
 
   }

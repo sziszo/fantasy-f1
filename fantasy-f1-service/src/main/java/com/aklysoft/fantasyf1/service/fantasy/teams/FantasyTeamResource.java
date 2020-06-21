@@ -1,7 +1,6 @@
 package com.aklysoft.fantasyf1.service.fantasy.teams;
 
 import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberResource;
-import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberResourceFactory;
 import com.aklysoft.fantasyf1.service.users.UserIdHolder;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +10,8 @@ import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+
+import static com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamMappers.toFantasyTeamViewItem;
 
 @Path("/api/v1/fantasy/{series}/teams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -23,34 +24,30 @@ public class FantasyTeamResource {
   private final FantasyTeamService fantasyTeamService;
   private final UserIdHolder userIdHolder;
 
-  private final FantasyTeamMemberResourceFactory fantasyTeamMemberResourceFactory;
-
   @Context
   private ResourceContext resourceContext;
 
-  public FantasyTeamResource(FantasyTeamService fantasyTeamService, UserIdHolder userIdHolder,
-                             FantasyTeamMemberResourceFactory fantasyTeamMemberResourceFactory) {
+  public FantasyTeamResource(FantasyTeamService fantasyTeamService, UserIdHolder userIdHolder) {
     this.fantasyTeamService = fantasyTeamService;
     this.userIdHolder = userIdHolder;
-    this.fantasyTeamMemberResourceFactory = fantasyTeamMemberResourceFactory;
   }
 
   @GET
   @Path("/{season}/all")
-  public List<FantasyTeam> getAllFantasyTeams(@PathParam("season") int season) {
-    return fantasyTeamService.getAllFantasyTeams(series, season);
+  public List<FantasyTeamViewItem> getAllFantasyTeams(@PathParam("season") int season) {
+    return toFantasyTeamViewItem(fantasyTeamService.getAllFantasyTeams(series, season));
   }
 
   @GET
   @RolesAllowed("user")
   @Path("/{season}")
-  public FantasyTeam getFantasyTeam(@PathParam("season") int season) {
-    return fantasyTeamService.getFantasyTeam(series, season, userIdHolder.getCurrentUserName());
+  public FantasyTeamViewItem getFantasyTeam(@PathParam("season") int season) {
+    return toFantasyTeamViewItem(fantasyTeamService.getFantasyTeam(series, season, userIdHolder.getCurrentUserName()));
   }
 
   @GET
   @RolesAllowed("admin")
-  @Path("/{season}/{username}")
+  @Path("/{season}/admin/{username}")
   public FantasyTeam getFantasyTeam(@PathParam("season") int season, @PathParam("username") String username) {
     return fantasyTeamService.getFantasyTeam(series, season, username);
   }
@@ -72,7 +69,7 @@ public class FantasyTeamResource {
 
   @PUT
   @RolesAllowed("admin")
-  @Path("/{season}/{username}")
+  @Path("/{season}/admin/{username}")
   public FantasyTeam createFantasyTeam(@PathParam("season") int season, @PathParam("username") String username, String name) {
     return fantasyTeamService.createFantasyTeam(
             NewFantasyTeam
@@ -103,7 +100,7 @@ public class FantasyTeamResource {
 
   @POST
   @RolesAllowed("admin")
-  @Path("/{season}/{username}")
+  @Path("/{season}/admin/{username}")
   public FantasyTeam updateFantasyTeam(@PathParam("season") int season, @PathParam("username") String username, String name) {
     return fantasyTeamService.updateFantasyTeam(
             ModifyFantasyTeam
@@ -117,8 +114,8 @@ public class FantasyTeamResource {
     );
   }
 
-  @Path("/{season}/{username}/members")
+  @Path("/{season}/members")
   public FantasyTeamMemberResource fantasyTeamMemberResource() {
-    return fantasyTeamMemberResourceFactory.create(resourceContext);
+    return resourceContext.getResource(FantasyTeamMemberResource.class);
   }
 }

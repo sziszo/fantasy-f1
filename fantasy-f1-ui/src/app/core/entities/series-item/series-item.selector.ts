@@ -13,7 +13,18 @@ export const selectAllSeriesItems = createSelector(
   fromSeriesItem.selectAll
 );
 
+export const selectSeriesItemEntities = createSelector(
+  selectSeriesItemEntitiesState,
+  fromSeriesItem.selectEntities
+);
+
 export const getSelectedSeriesId = createSelector(
   selectSeriesItemEntitiesState,
   fromSeriesItem.selectedSeriesId,
+);
+
+export const getSelectedSeriesItem = createSelector(
+  selectSeriesItemEntities,
+  getSelectedSeriesId,
+  (ent, id) => !id ? null : ent[id]
 );

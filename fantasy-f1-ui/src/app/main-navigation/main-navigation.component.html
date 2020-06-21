@@ -6,8 +6,9 @@
 
   <div class="container" fxLayout="row" fxLayoutGap="1em" style="padding-left: 1em">
 
-    <app-series-selector></app-series-selector>
-    <app-season-selector></app-season-selector>
+    <app-series-selector [selectedSeries]="selectedSeries" (selectionChange)="onSeriesChanged($event)"></app-series-selector>
+    <app-season-selector [seasonItems$]="seasonItems$" [selectedSeason]="selectedSeasonId" (selectionChange)="onSeasonChanged($event)"></app-season-selector>
+    <app-race-selector [raceItems$]="raceItems$" [selectedRace]="selectedRaceId" (selectionChange)="onRaceChanged($event)"></app-race-selector>
 
   </div>
 </mat-toolbar>

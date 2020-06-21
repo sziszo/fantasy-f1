@@ -1,5 +1,6 @@
 package com.aklysoft.fantasyf1.service.fantasy.teams;
 
+import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -24,7 +25,7 @@ class FantasyTeamRepositoryImplTest {
   @PersistenceContext
   EntityManager em;
 
-  private String series = "f1";
+  private String series = FantasySeriesType.FORMULA_1.id;
   private int season = 2019;
 
   private String user1 = "user";

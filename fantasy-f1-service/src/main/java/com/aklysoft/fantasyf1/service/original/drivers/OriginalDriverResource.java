@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
+import static com.aklysoft.fantasyf1.service.original.drivers.OriginalDriverMappers.toOriginalDriverViewItems;
+
 @Produces(MediaType.APPLICATION_JSON)
 public class OriginalDriverResource implements OriginalSubResource {
 
@@ -21,9 +23,9 @@ public class OriginalDriverResource implements OriginalSubResource {
   }
 
   @GET
-  @Path("/{year}")
-  public List<OriginalDriver> getDrivers(@PathParam("year") int year) {
-    return originalDriverService.getDrivers(series, year);
+  @Path("/{season}")
+  public List<OriginalDriverViewItem> getDrivers(@PathParam("season") int season) {
+    return toOriginalDriverViewItems(originalDriverService.getDrivers(series, season));
   }
 
 }

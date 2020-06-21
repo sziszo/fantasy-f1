@@ -7,14 +7,18 @@ export const seriesItemsFeatureKey = 'seriesItems';
 
 export interface State extends EntityState<SeriesItem> {
   // additional entities state properties
-  selectedSeriesId: string
+  selectedSeriesId: string;
+  loading: boolean;
+  error: Error | null;
 }
 
 export const adapter: EntityAdapter<SeriesItem> = createEntityAdapter<SeriesItem>();
 
 export const initialState: State = adapter.getInitialState({
   // additional entity state properties
-  selectedSeriesId: null
+  selectedSeriesId: null,
+  loading: false,
+  error: null
 });
 
 
@@ -54,7 +58,16 @@ export const reducer = createReducer(
     (state, action) => {
       return {...state, selectedSeriesId: action.selectedSeriesItemId}
     }
-  )
+  ),
+  on(SeriesItemActions.searchSeriesItems, (state, action) => {
+    return {...state, loading: true, error: null}
+  }),
+  on(SeriesItemActions.searchSeriesItemsSuccess, (state, action) => {
+    return adapter.setAll(action.seriesItems, {...state, loading: false, error: null, selectedSeriesId: action.selectedSeriesItemId})
+  }),
+  on(SeriesItemActions.searchSeriesItemsFailure, (state, action) => {
+    return {...state, loading: false, error: action.error}
+  }),
 );
 
 

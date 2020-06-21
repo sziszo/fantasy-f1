@@ -33,7 +33,7 @@ public class FantasyTeamMember {
 
   @Id
   @Enumerated(EnumType.STRING)
-  private FantasyTeamMemberTypeId teamMemberTypeId;
+  private FantasyTeamMemberCategoryType teamMemberTypeId;
 
   private String driverId;
 
@@ -57,7 +57,7 @@ public class FantasyTeamMember {
 
   @ManyToOne
   @JoinColumn(name = "teamMemberTypeId", insertable = false, updatable = false)
-  private FantasyTeamMemberType teamMemberType;
+  private FantasyTeamMemberCategory teamMemberType;
 
   @ManyToOne
   @JoinColumns({

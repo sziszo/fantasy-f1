@@ -1,5 +1,7 @@
 package com.aklysoft.fantasyf1.service.fantasy.members;
 
+import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
+import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamPK;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorNotExistException;
@@ -36,8 +38,11 @@ class FantasyTeamMemberServiceTest {
   @Mock
   private OriginalDriverService originalDriverService;
 
+  @Mock
+  private FantasyDefinitionService fantasyDefinitionService;
+
   final FantasyTeamPK teamId = FantasyTeamPK.builder()
-          .series("f1")
+          .series(FantasySeriesType.FORMULA_1.id)
           .season(2020)
           .userName("user")
           .build();
@@ -64,7 +69,7 @@ class FantasyTeamMemberServiceTest {
   void shouldSetValidConstructor() {
     //given
 
-    final FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.BODY;
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.BODY;
     final String constructorId = mclaren.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
@@ -74,17 +79,17 @@ class FantasyTeamMemberServiceTest {
 
     final List<FantasyTeamMember> fantasyTeamMembers = Stream.concat(
             Stream.of(fantasyTeamMember),
-            Stream.of(FantasyTeamMemberTypeId.values())
+            Stream.of(FantasyTeamMemberCategoryType.values())
                     .filter(typeId -> !typeId.equals(teamMemberTypeId))
                     .map(typeId -> {
 
                       OriginalDriver driver = null;
-                      if (typeId == FantasyTeamMemberTypeId.DRIVER_1) driver = hamilton;
-                      else if (typeId == FantasyTeamMemberTypeId.DRIVER_2) driver = vettel;
+                      if (typeId == FantasyTeamMemberCategoryType.DRIVER_1) driver = hamilton;
+                      else if (typeId == FantasyTeamMemberCategoryType.DRIVER_2) driver = vettel;
 
                       OriginalConstructor constructor = null;
-                      if (typeId == FantasyTeamMemberTypeId.ENGINE) constructor = redbull;
-                      else if (typeId == FantasyTeamMemberTypeId.STAFF) constructor = renault;
+                      if (typeId == FantasyTeamMemberCategoryType.ENGINE) constructor = redbull;
+                      else if (typeId == FantasyTeamMemberCategoryType.STAFF) constructor = renault;
 
                       return FantasyTeamMember
                               .builder()
@@ -93,7 +98,7 @@ class FantasyTeamMemberServiceTest {
                               .userName(teamId.getUserName())
                               .round(race)
                               .teamMemberTypeId(typeId)
-                              .teamMemberType(FantasyTeamMemberType.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberTypeId.DRIVER_1 && typeId != FantasyTeamMemberTypeId.DRIVER_2).build())
+                              .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberCategoryType.DRIVER_1 && typeId != FantasyTeamMemberCategoryType.DRIVER_2).build())
                               .driver(driver)
                               .driverId(driver == null ? null : driver.getId())
                               .constructor(constructor)
@@ -105,7 +110,6 @@ class FantasyTeamMemberServiceTest {
     when(fantasyTeamMemberRepository.getFantasyTeamMembers(teamId, race)).thenReturn(fantasyTeamMembers);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
             .id(constructorId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
@@ -114,7 +118,7 @@ class FantasyTeamMemberServiceTest {
     when(originalConstructorService.getConstructor(teamId.getSeries(), teamId.getSeason(), constructorId)).thenReturn(mclaren);
 
     //when
-    FantasyTeamMember result = fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember);
+    FantasyTeamMember result = fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember);
 
     //then
     assertEquals(constructorId, result.getConstructorId());
@@ -133,7 +137,7 @@ class FantasyTeamMemberServiceTest {
   @Test
   void shouldSetValidDriver() {
     //given
-    final FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.DRIVER_1;
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.DRIVER_1;
     final String driverId = hamilton.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
@@ -143,17 +147,17 @@ class FantasyTeamMemberServiceTest {
 
     final List<FantasyTeamMember> fantasyTeamMembers = Stream.concat(
             Stream.of(fantasyTeamMember),
-            Stream.of(FantasyTeamMemberTypeId.values())
+            Stream.of(FantasyTeamMemberCategoryType.values())
                     .filter(typeId -> !typeId.equals(teamMemberTypeId))
                     .map(typeId -> {
 
                       OriginalConstructor constructor = null;
-                      if (typeId == FantasyTeamMemberTypeId.ENGINE) constructor = redbull;
-                      else if (typeId == FantasyTeamMemberTypeId.STAFF) constructor = renault;
-                      else if (typeId == FantasyTeamMemberTypeId.BODY) constructor = mclaren;
+                      if (typeId == FantasyTeamMemberCategoryType.ENGINE) constructor = redbull;
+                      else if (typeId == FantasyTeamMemberCategoryType.STAFF) constructor = renault;
+                      else if (typeId == FantasyTeamMemberCategoryType.BODY) constructor = mclaren;
 
                       OriginalDriver driver = null;
-                      if (typeId == FantasyTeamMemberTypeId.DRIVER_2) driver = vettel;
+                      if (typeId == FantasyTeamMemberCategoryType.DRIVER_2) driver = vettel;
 
                       return FantasyTeamMember
                               .builder()
@@ -162,7 +166,7 @@ class FantasyTeamMemberServiceTest {
                               .userName(teamId.getUserName())
                               .round(race)
                               .teamMemberTypeId(typeId)
-                              .teamMemberType(FantasyTeamMemberType.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberTypeId.DRIVER_2).build())
+                              .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberCategoryType.DRIVER_2).build())
                               .driver(driver)
                               .driverId(driver == null ? null : driver.getId())
                               .constructor(constructor)
@@ -174,7 +178,6 @@ class FantasyTeamMemberServiceTest {
     when(fantasyTeamMemberRepository.getFantasyTeamMembers(teamId, race)).thenReturn(fantasyTeamMembers);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
             .id(driverId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
@@ -183,7 +186,7 @@ class FantasyTeamMemberServiceTest {
     when(originalDriverService.getDriver(teamId.getSeries(), teamId.getSeason(), driverId)).thenReturn(hamilton);
 
     //when
-    FantasyTeamMember result = fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember);
+    FantasyTeamMember result = fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember);
 
     //then
     assertEquals(driverId, result.getDriverId());
@@ -199,54 +202,30 @@ class FantasyTeamMemberServiceTest {
     verify(originalDriverService).getDriver(anyString(), anyInt(), anyString());
   }
 
-  private FantasyTeamMemberPK createTeamMemberId(FantasyTeamMemberTypeId teamMemberTypeId) {
-    return FantasyTeamMemberPK
-            .builder()
-            .series(teamId.getSeries())
-            .season(teamId.getSeason())
-            .userName(teamId.getUserName())
-            .round(race)
-            .teamMemberTypeId(teamMemberTypeId)
-            .build();
-  }
-
-  private FantasyTeamMember createFantasyTeamMember(FantasyTeamMemberTypeId teamMemberTypeId, boolean constructor) {
-    return FantasyTeamMember
-            .builder()
-            .series(teamId.getSeries())
-            .season(teamId.getSeason())
-            .userName(teamId.getUserName())
-            .round(race)
-            .teamMemberTypeId(teamMemberTypeId)
-            .teamMemberType(FantasyTeamMemberType.builder().id(teamMemberTypeId).isConstructor(constructor).build())
-            .build();
-  }
-
   @Test
-  void shouldThrowExceptionWhenConstructorIsInValid() {
-
+  void shouldSetMyDriver() {
     //given
-    final FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.BODY;
-    final String constructorId = mclaren.getId();
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.DRIVER_1;
+    final String driverId = hamilton.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
-    final FantasyTeamMember fantasyTeamMember = createFantasyTeamMember(teamMemberTypeId, true);
+    final FantasyTeamMember fantasyTeamMember = createFantasyTeamMember(teamMemberTypeId, false);
     when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(fantasyTeamMember);
 
 
     final List<FantasyTeamMember> fantasyTeamMembers = Stream.concat(
             Stream.of(fantasyTeamMember),
-            Stream.of(FantasyTeamMemberTypeId.values())
+            Stream.of(FantasyTeamMemberCategoryType.values())
                     .filter(typeId -> !typeId.equals(teamMemberTypeId))
                     .map(typeId -> {
 
-                      OriginalDriver driver = null;
-                      if (typeId == FantasyTeamMemberTypeId.DRIVER_1) driver = hamilton;
-                      else if (typeId == FantasyTeamMemberTypeId.DRIVER_2) driver = sainz;
-
                       OriginalConstructor constructor = null;
-                      if (typeId == FantasyTeamMemberTypeId.ENGINE) constructor = redbull;
-                      else if (typeId == FantasyTeamMemberTypeId.STAFF) constructor = renault;
+                      if (typeId == FantasyTeamMemberCategoryType.ENGINE) constructor = redbull;
+                      else if (typeId == FantasyTeamMemberCategoryType.STAFF) constructor = renault;
+                      else if (typeId == FantasyTeamMemberCategoryType.BODY) constructor = mclaren;
+
+                      OriginalDriver driver = null;
+                      if (typeId == FantasyTeamMemberCategoryType.DRIVER_2) driver = vettel;
 
                       return FantasyTeamMember
                               .builder()
@@ -255,7 +234,7 @@ class FantasyTeamMemberServiceTest {
                               .userName(teamId.getUserName())
                               .round(race)
                               .teamMemberTypeId(typeId)
-                              .teamMemberType(FantasyTeamMemberType.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberTypeId.DRIVER_1 && typeId != FantasyTeamMemberTypeId.DRIVER_2).build())
+                              .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberCategoryType.DRIVER_2).build())
                               .driver(driver)
                               .driverId(driver == null ? null : driver.getId())
                               .constructor(constructor)
@@ -267,7 +246,103 @@ class FantasyTeamMemberServiceTest {
     when(fantasyTeamMemberRepository.getFantasyTeamMembers(teamId, race)).thenReturn(fantasyTeamMembers);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
+            .id(driverId)
+            .teamMemberTypeId(teamMemberTypeId)
+            .build();
+
+
+    when(originalDriverService.getDriver(teamId.getSeries(), teamId.getSeason(), driverId)).thenReturn(hamilton);
+
+    when(fantasyDefinitionService.getNextRace(teamId.getSeries(), teamId.getSeason())).thenReturn(race);
+
+    //when
+    FantasyTeamMember result = fantasyTeamMemberService.setTeamMember(teamId, null, modifyFantasyTeamMember);
+
+    //then
+    assertEquals(driverId, result.getDriverId());
+    assertEquals(hamilton, result.getDriver());
+
+    verify(fantasyDefinitionService).getNextRace(teamId.getSeries(), teamId.getSeason());
+    verify(fantasyDefinitionService).getNextRace(anyString(), anyInt());
+
+    verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
+    verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
+
+    verify(fantasyTeamMemberRepository).getFantasyTeamMembers(teamId, race);
+    verify(fantasyTeamMemberRepository).getFantasyTeamMembers(any(FantasyTeamPK.class), anyInt());
+
+    verify(originalDriverService).getDriver(teamId.getSeries(), teamId.getSeason(), driverId);
+    verify(originalDriverService).getDriver(anyString(), anyInt(), anyString());
+  }
+
+  private FantasyTeamMemberPK createTeamMemberId(FantasyTeamMemberCategoryType teamMemberTypeId) {
+    return FantasyTeamMemberPK
+            .builder()
+            .series(teamId.getSeries())
+            .season(teamId.getSeason())
+            .userName(teamId.getUserName())
+            .round(race)
+            .teamMemberTypeId(teamMemberTypeId)
+            .build();
+  }
+
+  private FantasyTeamMember createFantasyTeamMember(FantasyTeamMemberCategoryType teamMemberTypeId, boolean constructor) {
+    return FantasyTeamMember
+            .builder()
+            .series(teamId.getSeries())
+            .season(teamId.getSeason())
+            .userName(teamId.getUserName())
+            .round(race)
+            .teamMemberTypeId(teamMemberTypeId)
+            .teamMemberType(FantasyTeamMemberCategory.builder().id(teamMemberTypeId).isConstructor(constructor).build())
+            .build();
+  }
+
+  @Test
+  void shouldThrowExceptionWhenConstructorIsInValid() {
+
+    //given
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.BODY;
+    final String constructorId = mclaren.getId();
+
+    final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
+    final FantasyTeamMember fantasyTeamMember = createFantasyTeamMember(teamMemberTypeId, true);
+    when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(fantasyTeamMember);
+
+
+    final List<FantasyTeamMember> fantasyTeamMembers = Stream.concat(
+            Stream.of(fantasyTeamMember),
+            Stream.of(FantasyTeamMemberCategoryType.values())
+                    .filter(typeId -> !typeId.equals(teamMemberTypeId))
+                    .map(typeId -> {
+
+                      OriginalDriver driver = null;
+                      if (typeId == FantasyTeamMemberCategoryType.DRIVER_1) driver = hamilton;
+                      else if (typeId == FantasyTeamMemberCategoryType.DRIVER_2) driver = sainz;
+
+                      OriginalConstructor constructor = null;
+                      if (typeId == FantasyTeamMemberCategoryType.ENGINE) constructor = redbull;
+                      else if (typeId == FantasyTeamMemberCategoryType.STAFF) constructor = renault;
+
+                      return FantasyTeamMember
+                              .builder()
+                              .series(teamId.getSeries())
+                              .season(teamId.getSeason())
+                              .userName(teamId.getUserName())
+                              .round(race)
+                              .teamMemberTypeId(typeId)
+                              .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberCategoryType.DRIVER_1 && typeId != FantasyTeamMemberCategoryType.DRIVER_2).build())
+                              .driver(driver)
+                              .driverId(driver == null ? null : driver.getId())
+                              .constructor(constructor)
+                              .constructorId(constructor == null ? null : constructor.getId())
+                              .build();
+                    }))
+            .collect(Collectors.toList());
+
+    when(fantasyTeamMemberRepository.getFantasyTeamMembers(teamId, race)).thenReturn(fantasyTeamMembers);
+
+    ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
             .id(constructorId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
@@ -276,7 +351,7 @@ class FantasyTeamMemberServiceTest {
     when(originalConstructorService.getConstructor(teamId.getSeries(), teamId.getSeason(), constructorId)).thenReturn(mclaren);
 
     //when & then
-    assertThrows(InvalidFantasyTeamMemberException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember));
+    assertThrows(InvalidFantasyTeamMemberException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember));
 
     verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
     verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
@@ -291,7 +366,7 @@ class FantasyTeamMemberServiceTest {
   @Test
   void shouldThrowExceptionWhenDriverIsInValid() {
     //given
-    final FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.DRIVER_1;
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.DRIVER_1;
     final String driverId = hamilton.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
@@ -300,17 +375,17 @@ class FantasyTeamMemberServiceTest {
 
     final List<FantasyTeamMember> fantasyTeamMembers = Stream.concat(
             Stream.of(fantasyTeamMember),
-            Stream.of(FantasyTeamMemberTypeId.values())
+            Stream.of(FantasyTeamMemberCategoryType.values())
                     .filter(typeId -> !typeId.equals(teamMemberTypeId))
                     .map(typeId -> {
 
                       OriginalConstructor constructor = null;
-                      if (typeId == FantasyTeamMemberTypeId.ENGINE) constructor = redbull;
-                      else if (typeId == FantasyTeamMemberTypeId.STAFF) constructor = renault;
-                      else if (typeId == FantasyTeamMemberTypeId.BODY) constructor = mercedes;
+                      if (typeId == FantasyTeamMemberCategoryType.ENGINE) constructor = redbull;
+                      else if (typeId == FantasyTeamMemberCategoryType.STAFF) constructor = renault;
+                      else if (typeId == FantasyTeamMemberCategoryType.BODY) constructor = mercedes;
 
                       OriginalDriver driver = null;
-                      if (typeId == FantasyTeamMemberTypeId.DRIVER_2) driver = vettel;
+                      if (typeId == FantasyTeamMemberCategoryType.DRIVER_2) driver = vettel;
 
                       return FantasyTeamMember
                               .builder()
@@ -319,7 +394,7 @@ class FantasyTeamMemberServiceTest {
                               .userName(teamId.getUserName())
                               .round(race)
                               .teamMemberTypeId(typeId)
-                              .teamMemberType(FantasyTeamMemberType.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberTypeId.DRIVER_2).build())
+                              .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberCategoryType.DRIVER_2).build())
                               .driver(driver)
                               .driverId(driver == null ? null : driver.getId())
                               .constructor(constructor)
@@ -331,7 +406,6 @@ class FantasyTeamMemberServiceTest {
     when(fantasyTeamMemberRepository.getFantasyTeamMembers(teamId, race)).thenReturn(fantasyTeamMembers);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
             .id(driverId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
@@ -340,7 +414,7 @@ class FantasyTeamMemberServiceTest {
     when(originalDriverService.getDriver(teamId.getSeries(), teamId.getSeason(), driverId)).thenReturn(hamilton);
 
     //when & then
-    assertThrows(InvalidFantasyTeamMemberException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember));
+    assertThrows(InvalidFantasyTeamMemberException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember));
 
     verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
     verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
@@ -356,7 +430,7 @@ class FantasyTeamMemberServiceTest {
   public void shouldThrowExceptionWhenDriverWasSetAsConstructor() {
 
     //given
-    final FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.ENGINE;
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.ENGINE;
     final String driverId = hamilton.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
@@ -366,13 +440,12 @@ class FantasyTeamMemberServiceTest {
     when(originalConstructorService.getConstructor(teamId.getSeries(), teamId.getSeason(), driverId)).thenReturn(null);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
             .id(driverId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
 
     //when & then
-    assertThrows(OriginalConstructorNotExistException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember));
+    assertThrows(OriginalConstructorNotExistException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember));
 
     verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
     verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
@@ -387,7 +460,7 @@ class FantasyTeamMemberServiceTest {
   public void shouldThrowExceptionWhenConstructorWasSetAsDriver() {
 
     //given
-    final FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.DRIVER_1;
+    final FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.DRIVER_1;
     final String constructorId = mercedes.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
@@ -397,13 +470,12 @@ class FantasyTeamMemberServiceTest {
     when(originalDriverService.getDriver(teamId.getSeries(), teamId.getSeason(), constructorId)).thenReturn(null);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
             .id(constructorId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
 
     //when & then
-    assertThrows(OriginalDriverNotExistException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember));
+    assertThrows(OriginalDriverNotExistException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember));
 
     verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
     verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
@@ -417,20 +489,19 @@ class FantasyTeamMemberServiceTest {
   @Test
   public void shouldThrowExceptionWhenTeamMemberNotExist() {
 
-    FantasyTeamMemberTypeId teamMemberTypeId = FantasyTeamMemberTypeId.BODY;
+    FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.BODY;
     String constructorId = mclaren.getId();
 
     final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
     when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(null);
 
     ModifyFantasyTeamMember modifyFantasyTeamMember = ModifyFantasyTeamMember.builder()
-            .race(race)
             .id(constructorId)
             .teamMemberTypeId(teamMemberTypeId)
             .build();
 
     //when & then
-    assertThrows(FantasyTeamMemberNotExistException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, modifyFantasyTeamMember));
+    assertThrows(FantasyTeamMemberNotExistException.class, () -> fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember));
 
     verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
     verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
@@ -445,7 +516,7 @@ class FantasyTeamMemberServiceTest {
     //given
 
     final List<FantasyTeamMember> fantasyTeamMembers =
-            Stream.of(FantasyTeamMemberTypeId.values())
+            Stream.of(FantasyTeamMemberCategoryType.values())
                     .map(typeId -> {
 
                       OriginalDriver driver = null;
@@ -478,7 +549,7 @@ class FantasyTeamMemberServiceTest {
                               .userName(teamId.getUserName())
                               .round(race)
                               .teamMemberTypeId(typeId)
-                              .teamMemberType(FantasyTeamMemberType.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberTypeId.DRIVER_1 && typeId != FantasyTeamMemberTypeId.DRIVER_2).build())
+                              .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(typeId != FantasyTeamMemberCategoryType.DRIVER_1 && typeId != FantasyTeamMemberCategoryType.DRIVER_2).build())
                               .driver(driver)
                               .driverId(driver == null ? null : driver.getId())
                               .constructor(constructor)
@@ -494,8 +565,118 @@ class FantasyTeamMemberServiceTest {
 
     //then
     assertNotNull(result);
-    assertEquals(result.size(), FantasyTeamMemberTypeId.values().length);
+    assertEquals(result.size(), FantasyTeamMemberCategoryType.values().length);
     assertEquals(fantasyTeamMembers, result);
+  }
+
+  @Test
+  void shouldDeleteDriver() {
+
+    //given
+    final FantasyTeamMemberCategoryType teamMemberCategoryType = FantasyTeamMemberCategoryType.DRIVER_1;
+
+    final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberCategoryType);
+    final FantasyTeamMember fantasyTeamMember = createFantasyTeamMember(teamMemberCategoryType, false);
+    fantasyTeamMember.setDriverId(vettel.getId());
+
+    when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(fantasyTeamMember);
+    when(fantasyTeamMemberRepository.update(fantasyTeamMember)).thenAnswer(invocation -> invocation.getArgument(0));
+
+    final FantasyTeamMember expectedFantasyTeamMember = createFantasyTeamMember(teamMemberCategoryType, false);
+    expectedFantasyTeamMember.setDriverId(null);
+
+    //when
+    final FantasyTeamMember result = fantasyTeamMemberService.deleteTeamMember(teamId, race, teamMemberCategoryType);
+
+    //then
+    assertNotNull(result);
+    assertEquals(expectedFantasyTeamMember, result);
+
+    verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
+    verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
+
+    verify(fantasyTeamMemberRepository).update(fantasyTeamMember);
+    verify(fantasyTeamMemberRepository).update(any(FantasyTeamMember.class));
+  }
+
+  @Test
+  void shouldDeleteMyDriver() {
+
+    //given
+    final FantasyTeamMemberCategoryType teamMemberCategoryType = FantasyTeamMemberCategoryType.DRIVER_1;
+
+    final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberCategoryType);
+    final FantasyTeamMember fantasyTeamMember = createFantasyTeamMember(teamMemberCategoryType, false);
+    fantasyTeamMember.setDriverId(hamilton.getId());
+
+    when(fantasyDefinitionService.getNextRace(teamId.getSeries(), teamId.getSeason())).thenReturn(race);
+    when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(fantasyTeamMember);
+    when(fantasyTeamMemberRepository.update(fantasyTeamMember)).thenAnswer(invocation -> invocation.getArgument(0));
+
+    final FantasyTeamMember expectedFantasyTeamMember = createFantasyTeamMember(teamMemberCategoryType, false);
+    expectedFantasyTeamMember.setDriverId(null);
+
+    //when
+    final FantasyTeamMember result = fantasyTeamMemberService.deleteTeamMember(teamId, null, teamMemberCategoryType);
+
+    //then
+    assertNotNull(result);
+    assertEquals(expectedFantasyTeamMember, result);
+
+    verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
+    verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
+
+    verify(fantasyTeamMemberRepository).update(fantasyTeamMember);
+    verify(fantasyTeamMemberRepository).update(any(FantasyTeamMember.class));
+
+  }
+
+  @Test
+  void shouldDeleteConstructor() {
+
+    //given
+    final FantasyTeamMemberCategoryType teamMemberCategoryType = FantasyTeamMemberCategoryType.BODY;
+
+    final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberCategoryType);
+    final FantasyTeamMember fantasyTeamMember = createFantasyTeamMember(teamMemberCategoryType, true);
+    fantasyTeamMember.setConstructorId(mclaren.getId());
+
+    when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(fantasyTeamMember);
+    when(fantasyTeamMemberRepository.update(fantasyTeamMember)).thenAnswer(invocation -> invocation.getArgument(0));
+
+    final FantasyTeamMember expectedFantasyTeamMember = createFantasyTeamMember(teamMemberCategoryType, true);
+    expectedFantasyTeamMember.setConstructorId(null);
+
+    //when
+    final FantasyTeamMember result = fantasyTeamMemberService.deleteTeamMember(teamId, race, teamMemberCategoryType);
+
+    //then
+    assertNotNull(result);
+    assertEquals(expectedFantasyTeamMember, result);
+
+    verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
+    verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
+
+    verify(fantasyTeamMemberRepository).update(fantasyTeamMember);
+    verify(fantasyTeamMemberRepository).update(any(FantasyTeamMember.class));
+
+  }
+
+  @Test
+  public void shouldThrowExceptionOnDeleteTeamMemberWhenTeamMemberNotExist() {
+
+    FantasyTeamMemberCategoryType teamMemberTypeId = FantasyTeamMemberCategoryType.BODY;
+
+    final FantasyTeamMemberPK fantasyTeamMemberId = createTeamMemberId(teamMemberTypeId);
+    when(fantasyTeamMemberRepository.findById(fantasyTeamMemberId)).thenReturn(null);
+
+    //when & then
+    assertThrows(FantasyTeamMemberNotExistException.class, () -> fantasyTeamMemberService.deleteTeamMember(teamId, race, teamMemberTypeId));
+
+    verify(fantasyTeamMemberRepository).findById(fantasyTeamMemberId);
+    verify(fantasyTeamMemberRepository).findById(any(FantasyTeamMemberPK.class));
+
+    verify(fantasyTeamMemberRepository, never()).update(any(FantasyTeamMember.class));
   }
 
 }
