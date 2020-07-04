@@ -1,6 +1,8 @@
 package com.aklysoft.fantasyf1.service.fantasy.teams;
 
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.http.ContentType;
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @QuarkusTest
+@QuarkusTestResource(H2DatabaseTestResource.class)
 @Tag("integration")
 class FantasyTeamResourceTest {
 

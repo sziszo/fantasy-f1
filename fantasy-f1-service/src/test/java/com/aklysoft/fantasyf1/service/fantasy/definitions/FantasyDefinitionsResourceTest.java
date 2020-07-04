@@ -4,6 +4,8 @@ import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeries;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesService;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
 import com.aklysoft.fantasyf1.service.original.races.OriginalRace;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.Tag;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @QuarkusTest
+@QuarkusTestResource(H2DatabaseTestResource.class)
 @Tag("integration")
 class FantasyDefinitionsResourceTest {
 
