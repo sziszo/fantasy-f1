@@ -32,7 +32,9 @@ app:
 "%test":
   quarkus:
     datasource:
-      url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}/${FANTASY_F1_TEST_DB:fantasy_f1_test}
+#      url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}/${FANTASY_F1_TEST_DB:fantasy_f1_test}
+      url: jdbc:h2:tcp://localhost/mem:fantasy_f1_test
+      driver: org.h2.Driver
     hibernate-orm:
       database:
         generation: drop-and-create

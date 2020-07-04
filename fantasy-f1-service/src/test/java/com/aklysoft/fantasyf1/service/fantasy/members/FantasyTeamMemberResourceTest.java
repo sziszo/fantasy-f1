@@ -5,6 +5,8 @@ import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamPK;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.drivers.OriginalDriver;
 import com.aklysoft.fantasyf1.service.users.UserIdHolder;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.http.ContentType;
@@ -27,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @QuarkusTest
+@QuarkusTestResource(H2DatabaseTestResource.class)
 @Tag("integration")
 class FantasyTeamMemberResourceTest {
 

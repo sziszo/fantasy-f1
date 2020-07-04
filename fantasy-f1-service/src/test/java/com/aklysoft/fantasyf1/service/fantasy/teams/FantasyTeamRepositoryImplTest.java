@@ -1,6 +1,8 @@
 package com.aklysoft.fantasyf1.service.fantasy.teams;
 
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -16,6 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
+@QuarkusTestResource(H2DatabaseTestResource.class)
 @Tag("integration")
 class FantasyTeamRepositoryImplTest {
 
