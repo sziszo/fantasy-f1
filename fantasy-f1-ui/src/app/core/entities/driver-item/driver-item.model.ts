@@ -8,6 +8,7 @@ export interface DriverItem {
   name: string;
   permanentNumber: number;
   url: string;
+  price: number;
 
   constructorId: string;
 }

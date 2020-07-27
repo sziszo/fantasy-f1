@@ -3,6 +3,10 @@ package com.aklysoft.fantasyf1.service.fantasy.definitions;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeries;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesService;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberCategory;
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberCategoryService;
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberCategoryType;
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberViewItem;
 import com.aklysoft.fantasyf1.service.original.races.OriginalRace;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.h2.H2DatabaseTestResource;
@@ -33,6 +37,9 @@ class FantasyDefinitionsResourceTest {
 
   @InjectMock
   FantasyDefinitionService fantasyDefinitionService;
+
+  @InjectMock
+  FantasyTeamMemberCategoryService fantasyTeamMemberCategoryService;
 
   final String series = FantasySeriesType.FORMULA_1.id;
   final int season = 2019;
@@ -145,5 +152,33 @@ class FantasyDefinitionsResourceTest {
 
     verify(fantasyDefinitionService).getFantasyRaceDefinition(series, season);
     verify(fantasyDefinitionService).getFantasyRaceDefinition(anyString(), anyInt());
+  }
+
+  @Test
+  void shouldGetTeamMemberCategories() {
+    List<FantasyTeamMemberCategory> teamMemberCategories = List.of(
+            FantasyTeamMemberCategory.builder().id(FantasyTeamMemberCategoryType.DRIVER_1).isConstructor(false).name("Driver-1").build(),
+            FantasyTeamMemberCategory.builder().id(FantasyTeamMemberCategoryType.DRIVER_2).isConstructor(false).name("Driver-2").build(),
+            FantasyTeamMemberCategory.builder().id(FantasyTeamMemberCategoryType.BODY).isConstructor(true).name("Body").build(),
+            FantasyTeamMemberCategory.builder().id(FantasyTeamMemberCategoryType.ENGINE).isConstructor(true).name("Engine").build(),
+            FantasyTeamMemberCategory.builder().id(FantasyTeamMemberCategoryType.STAFF).isConstructor(true).name("Staff").build()
+    );
+    when(fantasyTeamMemberCategoryService.getFantasyTeamMemberCategories()).thenReturn(teamMemberCategories);
+
+    //when
+    List<FantasyTeamMemberCategory> result = given()
+            .when()
+            .get("/api/v1/fantasy/defs/fantasy/team/member/categories")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .jsonPath()
+            .getList(".", FantasyTeamMemberCategory.class);
+
+    //then
+    assertNotNull(result);
+    assertEquals(teamMemberCategories, result);
+
   }
 }

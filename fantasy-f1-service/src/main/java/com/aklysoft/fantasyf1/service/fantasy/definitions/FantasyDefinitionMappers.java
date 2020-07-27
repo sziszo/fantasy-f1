@@ -10,6 +10,9 @@ import static java.util.stream.Collectors.toList;
 
 public class FantasyDefinitionMappers {
 
+  private FantasyDefinitionMappers() {
+  }
+
   public static List<FantasySeasonViewItem> toFantasySeasonViewItem(String series, List<Integer> seasons) {
     return toFantasySeasonViewItem(series, seasons.stream())
             .collect(toList());

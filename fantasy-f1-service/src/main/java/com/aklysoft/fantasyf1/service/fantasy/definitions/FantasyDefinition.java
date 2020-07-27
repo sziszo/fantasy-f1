@@ -24,8 +24,13 @@ public class FantasyDefinition {
 
   private Integer nextRace;
 
+  private Long initialMoney;
+
   @ManyToOne
   @JoinColumn(name = "series", referencedColumnName = "id", insertable = false, updatable = false)
   private FantasySeries fantasySeries;
+
+  private Integer initialDriverPrice;
+  private Integer initialConstructorPrice;
 
 }

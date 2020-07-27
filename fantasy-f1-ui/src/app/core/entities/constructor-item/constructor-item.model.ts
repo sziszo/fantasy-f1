@@ -6,6 +6,7 @@ export interface ConstructorItem {
   name: string;
   nationality: string;
   url: string;
+  price: number;
 }
 
 export interface ConstructorTableItem extends ConstructorItem {

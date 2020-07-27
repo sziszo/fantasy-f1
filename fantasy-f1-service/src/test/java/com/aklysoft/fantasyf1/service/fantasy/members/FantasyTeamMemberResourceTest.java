@@ -1,6 +1,7 @@
 package com.aklysoft.fantasyf1.service.fantasy.members;
 
 import com.aklysoft.fantasyf1.service.fantasy.definitions.series.FantasySeriesType;
+import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeam;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamPK;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.drivers.OriginalDriver;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 
 import static com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberMappers.toFantasyTeamMemberViewItem;
 import static com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberMappers.toFantasyTeamMemberViewItems;
+import static com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamMappers.toFantasyTeamViewItem;
 import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -349,8 +351,8 @@ class FantasyTeamMemberResourceTest {
 
     final FantasyTeamMemberCategoryType typeId = FantasyTeamMemberCategoryType.DRIVER_1;
 
-    ModifyFantasyTeamMember modifyFantasyTeamMember =
-            ModifyFantasyTeamMember
+    ModifyFantasyTeamMemberQuery modifyFantasyTeamMemberQuery =
+            ModifyFantasyTeamMemberQuery
                     .builder()
                     .teamMemberTypeId(typeId)
                     .id(hamilton.getId())
@@ -367,13 +369,13 @@ class FantasyTeamMemberResourceTest {
             .driver(hamilton)
             .driverId(hamilton.getId())
             .build();
-    when(fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMember))
+    when(fantasyTeamMemberService.setTeamMember(teamId, race, modifyFantasyTeamMemberQuery))
             .thenReturn(fantasyTeamMember);
 
     final FantasyTeamMember result = given()
             .auth().basic(admin, admin)
             .contentType(ContentType.JSON)
-            .body(modifyFantasyTeamMember)
+            .body(modifyFantasyTeamMemberQuery)
             .queryParam("race", race)
             .when()
             .post("/api/v1/fantasy/{series}/teams/{season}/members/admin/{username}",
@@ -390,8 +392,8 @@ class FantasyTeamMemberResourceTest {
     assertNotNull(result);
     assertEquals(fantasyTeamMember, result);
 
-    verify(fantasyTeamMemberService).setTeamMember(teamId, race, modifyFantasyTeamMember);
-    verify(fantasyTeamMemberService).setTeamMember(any(FantasyTeamPK.class), anyInt(), any(ModifyFantasyTeamMember.class));
+    verify(fantasyTeamMemberService).setTeamMember(teamId, race, modifyFantasyTeamMemberQuery);
+    verify(fantasyTeamMemberService).setTeamMember(any(FantasyTeamPK.class), anyInt(), any(ModifyFantasyTeamMemberQuery.class));
 
   }
 
@@ -399,8 +401,8 @@ class FantasyTeamMemberResourceTest {
   public void shouldGet403WhenSetOthersFantasyTeamMember() {
     final FantasyTeamMemberCategoryType typeId = FantasyTeamMemberCategoryType.DRIVER_1;
 
-    ModifyFantasyTeamMember modifyFantasyTeamMember =
-            ModifyFantasyTeamMember
+    ModifyFantasyTeamMemberQuery modifyFantasyTeamMemberQuery =
+            ModifyFantasyTeamMemberQuery
                     .builder()
                     .teamMemberTypeId(typeId)
                     .id(hamilton.getId())
@@ -409,7 +411,7 @@ class FantasyTeamMemberResourceTest {
     given()
             .auth().basic(user1, user1)
             .contentType(ContentType.JSON)
-            .body(modifyFantasyTeamMember)
+            .body(modifyFantasyTeamMemberQuery)
             .when()
             .post("/api/v1/fantasy/{series}/teams/{season}/members/admin/{username}",
                     Map.of("series", teamId.getSeries(),
@@ -419,7 +421,7 @@ class FantasyTeamMemberResourceTest {
             .assertThat()
             .statusCode(403);
 
-    verify(fantasyTeamMemberService, never()).setTeamMember(any(FantasyTeamPK.class), anyInt(), any(ModifyFantasyTeamMember.class));
+    verify(fantasyTeamMemberService, never()).setTeamMember(any(FantasyTeamPK.class), anyInt(), any(ModifyFantasyTeamMemberQuery.class));
   }
 
   @Test
@@ -427,12 +429,21 @@ class FantasyTeamMemberResourceTest {
 
     final FantasyTeamMemberCategoryType typeId = FantasyTeamMemberCategoryType.DRIVER_1;
 
-    ModifyFantasyTeamMember modifyFantasyTeamMember =
-            ModifyFantasyTeamMember
+    ModifyFantasyTeamMemberQuery modifyFantasyTeamMemberQuery =
+            ModifyFantasyTeamMemberQuery
                     .builder()
                     .teamMemberTypeId(typeId)
                     .id(hamilton.getId())
                     .build();
+
+    final FantasyTeam fantasyTeam = FantasyTeam
+            .builder()
+            .series(teamId.getSeries())
+            .season(teamId.getSeason())
+            .userName(teamId.getUserName())
+            .name("test-team")
+            .money(1_000_000L)
+            .build();
 
     final FantasyTeamMember fantasyTeamMember = FantasyTeamMember
             .builder()
@@ -444,15 +455,23 @@ class FantasyTeamMemberResourceTest {
             .teamMemberType(FantasyTeamMemberCategory.builder().id(typeId).isConstructor(false).build())
             .driver(hamilton)
             .driverId(hamilton.getId())
+            .team(fantasyTeam)
             .build();
 
-    when(fantasyTeamMemberService.setTeamMember(teamId, null, modifyFantasyTeamMember)).thenReturn(fantasyTeamMember);
+    when(fantasyTeamMemberService.setTeamMember(teamId, null, modifyFantasyTeamMemberQuery)).thenReturn(fantasyTeamMember);
     when(userIdHolder.getCurrentUserName()).thenReturn(user1);
 
-    final FantasyTeamMemberViewItem result = given()
+    final ModifyFantasyTeamMemberResponse expected = ModifyFantasyTeamMemberResponse
+            .builder()
+            .fantasyTeamViewItem(toFantasyTeamViewItem(fantasyTeam))
+            .fantasyTeamMemberViewItem(toFantasyTeamMemberViewItem(fantasyTeamMember))
+            .build();
+
+
+    final ModifyFantasyTeamMemberResponse result = given()
             .auth().basic(user1, user1)
             .contentType(ContentType.JSON)
-            .body(modifyFantasyTeamMember)
+            .body(modifyFantasyTeamMemberQuery)
             .when()
             .post("/api/v1/fantasy/{series}/teams/{season}/members",
                     Map.of("series", teamId.getSeries(),
@@ -462,12 +481,13 @@ class FantasyTeamMemberResourceTest {
             .statusCode(200)
             .extract()
             .body()
-            .as(FantasyTeamMemberViewItem.class);
+            .as(ModifyFantasyTeamMemberResponse.class);
+
 
     assertNotNull(result);
-    assertEquals(toFantasyTeamMemberViewItem(fantasyTeamMember), result);
+    assertEquals(expected, result);
 
-    verify(fantasyTeamMemberService).setTeamMember(teamId, null, modifyFantasyTeamMember);
+    verify(fantasyTeamMemberService).setTeamMember(teamId, null, modifyFantasyTeamMemberQuery);
 //    verify(fantasyTeamMemberService).setTeamMember(any(FantasyTeamPK.class), null, any(ModifyFantasyTeamMember.class));
     verify(userIdHolder).getCurrentUserName();
 
@@ -477,6 +497,15 @@ class FantasyTeamMemberResourceTest {
   public void testDeleteMyTeamMember() {
 
     final FantasyTeamMemberCategoryType teamMemberCategoryType = FantasyTeamMemberCategoryType.DRIVER_1;
+
+    final FantasyTeam fantasyTeam = FantasyTeam
+            .builder()
+            .series(teamId.getSeries())
+            .season(teamId.getSeason())
+            .userName(teamId.getUserName())
+            .name("test-team")
+            .money(1_000_000L)
+            .build();
 
     final FantasyTeamMember fantasyTeamMember = FantasyTeamMember
             .builder()
@@ -488,12 +517,19 @@ class FantasyTeamMemberResourceTest {
             .teamMemberType(FantasyTeamMemberCategory.builder().id(teamMemberCategoryType).isConstructor(false).build())
             .driver(hamilton)
             .driverId(hamilton.getId())
+            .team(fantasyTeam)
             .build();
 
     when(fantasyTeamMemberService.deleteTeamMember(teamId, null, teamMemberCategoryType)).thenReturn(fantasyTeamMember);
     when(userIdHolder.getCurrentUserName()).thenReturn(user1);
 
-    final FantasyTeamMemberViewItem result = given()
+    DeleteFantasyTeamMemberResponse expected = DeleteFantasyTeamMemberResponse
+            .builder()
+            .fantasyTeamViewItem(toFantasyTeamViewItem(fantasyTeam))
+            .fantasyTeamMemberViewItem(toFantasyTeamMemberViewItem(fantasyTeamMember))
+            .build();
+
+    final DeleteFantasyTeamMemberResponse result = given()
             .auth().basic(user1, user1)
             .when()
             .delete("/api/v1/fantasy/{series}/teams/{season}/members/{teamMemberCategoryType}",
@@ -505,10 +541,10 @@ class FantasyTeamMemberResourceTest {
             .statusCode(200)
             .extract()
             .body()
-            .as(FantasyTeamMemberViewItem.class);
+            .as(DeleteFantasyTeamMemberResponse.class);
 
     assertNotNull(result);
-    assertEquals(toFantasyTeamMemberViewItem(fantasyTeamMember), result);
+    assertEquals(expected, result);
 
     verify(fantasyTeamMemberService).deleteTeamMember(teamId, null, teamMemberCategoryType);
     verify(userIdHolder).getCurrentUserName();

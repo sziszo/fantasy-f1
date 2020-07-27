@@ -37,6 +37,7 @@ class FantasyDefinitionServiceTest {
   final String series = FantasySeriesType.FORMULA_1.id;
   final int season = 2019;
   final int race = 1;
+  final String invalidSeries = "ff";
 
   @Test
   public void shouldGetCurrentSeason() {
@@ -50,8 +51,8 @@ class FantasyDefinitionServiceTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenGetCurrentSeasonAndSeriesIsInvalid() {
-    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getCurrentSeason("ff"));
+  public void shouldThrowExceptionOnGetCurrentSeasonWhenSeriesIsInvalid() {
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getCurrentSeason(invalidSeries));
     verify(fantasyDefinitionRepository, never()).getCurrentSeason(anyString());
   }
 
@@ -67,12 +68,12 @@ class FantasyDefinitionServiceTest {
 
   @Test
   public void shouldThrowExceptionWhenGetNextRaceAndSeriesIsInvalid() {
-    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getNextRace("ff", season));
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getNextRace(invalidSeries, season));
     verify(fantasyDefinitionRepository, never()).getNextRace(anyString(), anyInt());
   }
 
   @Test
-  public void shouldThrowExceptionWhenGetNextRaceAndSeasonIsInvalid() {
+  public void shouldThrowExceptionOnGetNextRaceWhenSeasonIsInvalid() {
     //given
     final int invalidSeason = 2010;
     when(fantasyDefinitionRepository.getNextRace(series, invalidSeason)).thenReturn(null);
@@ -97,8 +98,8 @@ class FantasyDefinitionServiceTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenGetNextFantasySeasonsAndSeriesIsInvalid() {
-    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getFantasySeasons("ff"));
+  public void shouldThrowExceptionOnGetNextFantasySeasonsWhenSeriesIsInvalid() {
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getFantasySeasons(invalidSeries));
     verify(fantasyDefinitionRepository, never()).getSeasons(anyString());
   }
 
@@ -129,10 +130,49 @@ class FantasyDefinitionServiceTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenGetFantasyRaceDefinitionAndSeriesIsInvalid() {
-    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getFantasyRaceDefinition("ff", season));
+  public void shouldThrowExceptionOnGetFantasyRaceDefinitionWhenSeriesIsInvalid() {
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getFantasyRaceDefinition(invalidSeries, season));
 
     verify(originalRaceService, never()).getRaces(anyString(), anyInt());
     verify(fantasyDefinitionRepository, never()).getNextRace(anyString(), anyInt());
+  }
+
+  @Test
+  void shouldGetInitialMoney() {
+    final long expectedInitialMoney = 1_000_00;
+    when(fantasyDefinitionRepository.getInitialMoney(series, season)).thenReturn(expectedInitialMoney);
+    assertEquals(expectedInitialMoney, fantasyDefinitionService.getInitialMoney(series, season));
+  }
+
+  @Test
+  void shouldThrowExceptionOnGetInitialMoneyWhenSeriesIsInvalid() {
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getInitialMoney(invalidSeries, season));
+    verify(fantasyDefinitionRepository, never()).getInitialMoney(anyString(), anyInt());
+  }
+
+  @Test
+  void shouldGetInitialDriverPrice() {
+    final int expectedDriverPrice = 15_000_00;
+    when(fantasyDefinitionRepository.getInitialDriverPrice(series, season)).thenReturn(expectedDriverPrice);
+    assertEquals(expectedDriverPrice, fantasyDefinitionService.getInitialDriverPrice(series, season));
+  }
+
+  @Test
+  void shouldThrowExceptionOnGetInitialDriverPriceWhenSeriesIsInvalid() {
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getInitialDriverPrice(invalidSeries, season));
+    verify(fantasyDefinitionRepository, never()).getInitialDriverPrice(anyString(), anyInt());
+  }
+
+  @Test
+  void shouldGetInitialConstructorPrice() {
+    final int expectedConstructorPrice = 10_000_00;
+    when(fantasyDefinitionRepository.getInitialConstructorPrice(series, season)).thenReturn(expectedConstructorPrice);
+    assertEquals(expectedConstructorPrice, fantasyDefinitionService.getInitialConstructorPrice(series, season));
+  }
+
+  @Test
+  void shouldThrowExceptionOnGetInitialConstructorPriceWhenSeriesIsInvalid() {
+    assertThrows(InvalidFantasySeriesException.class, () -> fantasyDefinitionService.getInitialConstructorPrice(invalidSeries, season));
+    verify(fantasyDefinitionRepository, never()).getInitialConstructorPrice(anyString(), anyInt());
   }
 }

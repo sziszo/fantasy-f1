@@ -11,6 +11,7 @@ import java.util.List;
 
 import static com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberMappers.toFantasyTeamMemberViewItem;
 import static com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberMappers.toFantasyTeamMemberViewItems;
+import static com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamMappers.toFantasyTeamViewItem;
 import static java.util.Optional.ofNullable;
 
 
@@ -92,9 +93,10 @@ public class FantasyTeamMemberResource {
 
   @POST
   @RolesAllowed("user")
-  public FantasyTeamMemberViewItem setMyTeamMember(ModifyFantasyTeamMember modifyFantasyTeamMember) {
+  public ModifyFantasyTeamMemberResponse setMyTeamMember(ModifyFantasyTeamMemberQuery modifyFantasyTeamMemberQuery) {
     String username = userIdHolder.getCurrentUserName();
-    return toFantasyTeamMemberViewItem(fantasyTeamMemberService.setTeamMember(
+
+    final FantasyTeamMember fantasyTeamMember = fantasyTeamMemberService.setTeamMember(
             FantasyTeamPK
                     .builder()
                     .series(series)
@@ -102,13 +104,19 @@ public class FantasyTeamMemberResource {
                     .userName(username)
                     .build(),
             null,
-            modifyFantasyTeamMember));
+            modifyFantasyTeamMemberQuery);
+
+    return ModifyFantasyTeamMemberResponse
+            .builder()
+            .fantasyTeamViewItem(toFantasyTeamViewItem(fantasyTeamMember.getTeam()))
+            .fantasyTeamMemberViewItem(toFantasyTeamMemberViewItem(fantasyTeamMember))
+            .build();
   }
 
   @POST
   @RolesAllowed("admin")
   @Path("/admin/{username}")
-  public FantasyTeamMember setTeamMember(@PathParam("username") String username, @QueryParam("race") Integer race, ModifyFantasyTeamMember modifyFantasyTeamMember) {
+  public FantasyTeamMember setTeamMember(@PathParam("username") String username, @QueryParam("race") Integer race, ModifyFantasyTeamMemberQuery modifyFantasyTeamMemberQuery) {
 
     return fantasyTeamMemberService.setTeamMember(
             FantasyTeamPK
@@ -118,15 +126,15 @@ public class FantasyTeamMemberResource {
                     .userName(username)
                     .build(),
             race,
-            modifyFantasyTeamMember);
+            modifyFantasyTeamMemberQuery);
   }
 
   @DELETE
   @RolesAllowed("user")
   @Path("/{teamMemberCategoryType}")
-  public FantasyTeamMemberViewItem deleteMyTeamMember(@PathParam("teamMemberCategoryType") FantasyTeamMemberCategoryType teamMemberCategoryType) {
+  public DeleteFantasyTeamMemberResponse deleteMyTeamMember(@PathParam("teamMemberCategoryType") FantasyTeamMemberCategoryType teamMemberCategoryType) {
     String username = userIdHolder.getCurrentUserName();
-    return toFantasyTeamMemberViewItem(fantasyTeamMemberService.deleteTeamMember(
+    final FantasyTeamMember fantasyTeamMember = fantasyTeamMemberService.deleteTeamMember(
             FantasyTeamPK
                     .builder()
                     .series(series)
@@ -134,7 +142,13 @@ public class FantasyTeamMemberResource {
                     .userName(username)
                     .build(),
             null,
-            teamMemberCategoryType));
+            teamMemberCategoryType);
+
+    return DeleteFantasyTeamMemberResponse
+            .builder()
+            .fantasyTeamViewItem(toFantasyTeamViewItem(fantasyTeamMember.getTeam()))
+            .fantasyTeamMemberViewItem(toFantasyTeamMemberViewItem(fantasyTeamMember))
+            .build();
   }
 
   @DELETE

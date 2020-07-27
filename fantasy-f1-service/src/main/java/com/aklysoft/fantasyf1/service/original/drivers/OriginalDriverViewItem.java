@@ -21,5 +21,7 @@ public class OriginalDriverViewItem {
   private int permanentNumber;
   private String url;
 
+  private Long price;
+
   private String constructorId; //viewId
 }

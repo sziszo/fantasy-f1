@@ -5,4 +5,5 @@ export interface FantasyTeamItem {
   season: number;
   name: string;
   playerDisplayName: string;
+  money: number;
 }

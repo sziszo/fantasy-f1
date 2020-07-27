@@ -68,10 +68,11 @@ public class OriginalDriverMappers {
             .name(getDriverDisplayName(driver))
             .url(driver.getUrl())
             .permanentNumber(driver.getPermanentNumber())
+            .price(driver.getPrice())
             .build();
   }
 
-  private static String getDriverDisplayName(OriginalDriver driver) {
+  public static String getDriverDisplayName(OriginalDriver driver) {
     return driver.getGivenName() + " " + driver.getFamilyName();
   }
 }

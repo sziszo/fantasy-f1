@@ -14,6 +14,9 @@ import static java.util.stream.Collectors.toList;
 
 public class FantasyTeamMemberMappers {
 
+  private FantasyTeamMemberMappers() {
+  }
+
   public static FantasyTeamMemberViewItem toFantasyTeamMemberViewItem(FantasyTeamMember fantasyTeamMember) {
     return toFantasyTeamMemberViewItems(Stream.of(fantasyTeamMember))
             .findFirst()
@@ -47,8 +50,8 @@ public class FantasyTeamMemberMappers {
                               .orElse(""))
                       .constructorId(
                               Optional.ofNullable(fantasyTeamMember.getConstructorId())
-                              .map(constructorId -> toConstructorViewItemId(series, season, constructorId))
-                              .orElse(""))
+                                      .map(constructorId -> toConstructorViewItemId(series, season, constructorId))
+                                      .orElse(""))
                       .build();
             });
   }
