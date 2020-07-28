@@ -48,7 +48,10 @@ export const selectMyFantasyTeamItems = createSelector(
           teamMemberId: isConstructor ? member.constructorId : member.driverId,
           teamMemberName: isConstructor ?
             (member.constructorId ? constructors[member.constructorId].name : null) :
-            (member.driverId ? drivers[member.driverId].name : null)
+            (member.driverId ? drivers[member.driverId].name : null),
+          price: isConstructor ?
+            (member.constructorId ? constructors[member.constructorId].price : null) :
+            (member.driverId ? drivers[member.driverId].price : null)
         } as FantasyTeamMemberItemExt
       })
       .sort((a, b) => a.sortOrder - b.sortOrder)

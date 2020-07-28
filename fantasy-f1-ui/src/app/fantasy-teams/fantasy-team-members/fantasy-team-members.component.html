@@ -12,6 +12,9 @@
       </mat-card-header>
 
       <mat-card-content>
+        <div *ngIf="member.price">
+          <mat-label>Price: {{member.price | currency: 'EUR': 'symbol': '1.0-0'}}</mat-label>
+        </div>
       </mat-card-content>
       <mat-card-actions>
         <div fxLayout="row" fxLayoutAlign="space-between center">

@@ -21,7 +21,7 @@ export class DriverTableComponent implements AfterViewInit, OnInit, OnDestroy {
   dataSource: DriverTableDataSource;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['name', 'constructorName', 'actions'];
+  displayedColumns = ['name', 'constructorName', 'price', 'actions'];
 
   private unsubscribe$ = new Subject<void>();
 

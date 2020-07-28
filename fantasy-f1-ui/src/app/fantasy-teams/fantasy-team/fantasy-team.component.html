@@ -5,9 +5,8 @@
     <mat-card-subtitle>{{team?.playerDisplayName}}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-
+    <div>Money: {{team?.money | currency: 'EUR': 'symbol': '1.0-0'}}</div>
     <app-fantasy-team-members></app-fantasy-team-members>
-
   </mat-card-content>
 </mat-card>
 

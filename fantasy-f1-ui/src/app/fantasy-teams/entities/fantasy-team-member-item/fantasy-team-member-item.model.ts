@@ -1,3 +1,5 @@
+import { FantasyTeamItem } from "../fantasy-team-item/fantasy-team-item.model";
+
 export interface FantasyTeamMemberItem {
   id: string;
   teamId: string;
@@ -15,6 +17,7 @@ export interface FantasyTeamMemberItemExt extends FantasyTeamMemberItem {
   teamMemberId: string;
   teamMemberCategoryName: string;
   sortOrder: number;
+  price: number;
 }
 
 export interface SetTeamMember {
@@ -22,4 +25,14 @@ export interface SetTeamMember {
   id: string;
   teamMemberTypeId: string; //TeamMemberCategoryType
   race: number;
+}
+
+export interface SetTeamMemberResponse {
+  fantasyTeamMemberItem: FantasyTeamMemberItem;
+  fantasyTeamItem: FantasyTeamItem
+}
+
+export interface DeleteTeamMemberResponse {
+  fantasyTeamMemberItem: FantasyTeamMemberItem;
+  fantasyTeamItem: FantasyTeamItem
 }

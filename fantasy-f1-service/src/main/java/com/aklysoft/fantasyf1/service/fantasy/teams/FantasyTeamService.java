@@ -81,6 +81,7 @@ public class FantasyTeamService {
             .series(series)
             .season(season)
             .name(teamName)
+            .money(fantasyDefinitionService.getInitialMoney(series, season))
             .teamMembers(teamMembers)
             .player(playerService.getPlayer(username))
             .creator(newFantasyTeam.getCreator())

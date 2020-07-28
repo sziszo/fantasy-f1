@@ -1,6 +1,7 @@
 package com.aklysoft.fantasyf1.service.fantasy.members;
 
 import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
+import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeam;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamPK;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorNotExistException;
@@ -58,20 +59,20 @@ public class FantasyTeamMemberService {
   }
 
   @Transactional
-  public FantasyTeamMember setTeamMember(FantasyTeamPK teamId, Integer race, ModifyFantasyTeamMember modifyFantasyTeamMember) {
+  public FantasyTeamMember setTeamMember(FantasyTeamPK teamId, Integer race, ModifyFantasyTeamMemberQuery modifyFantasyTeamMemberQuery) {
     if (race == null) {
       race = fantasyDefinitionService.getNextRace(teamId.getSeries(), teamId.getSeason());
     }
 
-    final FantasyTeamMember fantasyTeamMember = getFantasyTeamMember(teamId, race, modifyFantasyTeamMember.getTeamMemberTypeId());
+    final FantasyTeamMember fantasyTeamMember = getFantasyTeamMember(teamId, race, modifyFantasyTeamMemberQuery.getTeamMemberTypeId());
     if (fantasyTeamMember == null) {
-      throw new FantasyTeamMemberNotExistException(modifyFantasyTeamMember.getTeamMemberTypeId());
+      throw new FantasyTeamMemberNotExistException(modifyFantasyTeamMemberQuery.getTeamMemberTypeId());
     }
 
     if (fantasyTeamMember.getTeamMemberType().isConstructor()) {
-      final OriginalConstructor constructor = originalConstructorService.getConstructor(teamId.getSeries(), teamId.getSeason(), modifyFantasyTeamMember.getId());
+      final OriginalConstructor constructor = originalConstructorService.getConstructor(teamId.getSeries(), teamId.getSeason(), modifyFantasyTeamMemberQuery.getId());
       if (constructor == null) {
-        throw new OriginalConstructorNotExistException(modifyFantasyTeamMember.getId());
+        throw new OriginalConstructorNotExistException(modifyFantasyTeamMemberQuery.getId());
       }
 
       //check driver & constructor rules
@@ -79,18 +80,23 @@ public class FantasyTeamMemberService {
         throw new InvalidFantasyTeamMemberException(constructor, teamId);
       }
 
+      updateTeamMoney(fantasyTeamMember, fantasyTeamMember.getConstructor(), constructor);
+
       fantasyTeamMember.setConstructorId(constructor.getId());
       fantasyTeamMember.setConstructor(constructor);
+
     } else {
-      final OriginalDriver driver = originalDriverService.getDriver(teamId.getSeries(), teamId.getSeason(), modifyFantasyTeamMember.getId());
+      final OriginalDriver driver = originalDriverService.getDriver(teamId.getSeries(), teamId.getSeason(), modifyFantasyTeamMemberQuery.getId());
       if (driver == null) {
-        throw new OriginalDriverNotExistException(modifyFantasyTeamMember.getId());
+        throw new OriginalDriverNotExistException(modifyFantasyTeamMemberQuery.getId());
       }
 
       //check driver & constructor rules
       if (!isValidDriver(teamId, race, driver)) {
         throw new InvalidFantasyTeamMemberException(driver, teamId);
       }
+
+      updateTeamMoney(fantasyTeamMember, fantasyTeamMember.getDriver(), driver);
 
       fantasyTeamMember.setDriverId(driver.getId());
       fantasyTeamMember.setDriver(driver);
@@ -129,6 +135,26 @@ public class FantasyTeamMemberService {
     return isValidDriver && isValidConstructor(fantasyTeamMembers, driver.getConstructor());
   }
 
+  private void updateTeamMoney(FantasyTeamMember fantasyTeamMember, FantasyTeamMemberPriceItem currentFantasyTeamMemberPriceItem,
+                               FantasyTeamMemberPriceItem newFantasyTeamMemberPriceItem) {
+
+    final FantasyTeam fantasyTeam = fantasyTeamMember.getTeam();
+    long money = fantasyTeam.getMoney();
+    if (currentFantasyTeamMemberPriceItem != null) {
+      money += currentFantasyTeamMemberPriceItem.getPrice();
+    }
+
+    if (newFantasyTeamMemberPriceItem != null) {
+      if (money < newFantasyTeamMemberPriceItem.getPrice()) {
+        throw new FantasyTeamMemberPriceTooHighException(newFantasyTeamMemberPriceItem);
+      }
+      money -= newFantasyTeamMemberPriceItem.getPrice();
+    }
+
+    fantasyTeam.setMoney(money);
+  }
+
+
   @Transactional
   public FantasyTeamMember deleteTeamMember(FantasyTeamPK teamId, Integer race, FantasyTeamMemberCategoryType teamMemberCategoryType) {
 
@@ -142,11 +168,15 @@ public class FantasyTeamMemberService {
     }
 
     if (fantasyTeamMember.getTeamMemberType().isConstructor()) {
+      updateTeamMoney(fantasyTeamMember, fantasyTeamMember.getConstructor(), null);
       fantasyTeamMember.setConstructorId(null);
     } else {
+      updateTeamMoney(fantasyTeamMember, fantasyTeamMember.getDriver(), null);
       fantasyTeamMember.setDriverId(null);
     }
 
     return fantasyTeamMemberRepository.update(fantasyTeamMember);
   }
+
+
 }

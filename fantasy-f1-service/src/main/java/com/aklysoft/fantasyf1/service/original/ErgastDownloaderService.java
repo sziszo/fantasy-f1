@@ -3,12 +3,13 @@ package com.aklysoft.fantasyf1.service.original;
 import com.aklysoft.fantasyf1.service.original.constructors.model.EConstructorData;
 import com.aklysoft.fantasyf1.service.original.drivers.model.EDriverData;
 import com.aklysoft.fantasyf1.service.original.races.model.ERaceData;
+import com.aklysoft.fantasyf1.service.original.standings.model.EConstructorStandingData;
+import com.aklysoft.fantasyf1.service.original.standings.model.EDriverStandingData;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.awt.color.ICC_Profile;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -56,6 +57,21 @@ public interface ErgastDownloaderService {
   @GET
   @Path("/{series}/{year}/constructors/{constructor}/drivers.json")
   EResponse<EDriverData> getConstructorDrivers(@PathParam("series") String series, @PathParam("year") int year,
-                                    @PathParam("constructor") String constructor);
+                                               @PathParam("constructor") String constructor);
 
+  @GET
+  @Path("/{series}/{year}/driverStandings.json")
+  EResponse<EDriverStandingData> getDriverStandings(@PathParam("series") String series, @PathParam("year") int year);
+
+  @GET
+  @Path("/{series}/{year}/{round}/driverStandings.json")
+  EResponse<EDriverStandingData> getDriverStandings(@PathParam("series") String series, @PathParam("year") int year, @PathParam("round") int round);
+
+  @GET
+  @Path("/{series}/{year}/constructorStandings.json")
+  EResponse<EConstructorStandingData> getConstructorStandings(@PathParam("series") String series, @PathParam("year") int year);
+
+  @GET
+  @Path("/{series}/{year}/{round}/constructorStandings.json")
+  EResponse<EConstructorStandingData> getConstructorStandings(@PathParam("series") String series, @PathParam("year") int year, @PathParam("round") int round);
 }

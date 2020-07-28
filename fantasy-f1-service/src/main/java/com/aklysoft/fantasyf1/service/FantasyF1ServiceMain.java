@@ -1,6 +1,8 @@
 package com.aklysoft.fantasyf1.service;
 
+import com.aklysoft.fantasyf1.service.fantasy.constructors.FantasyConstructorService;
 import com.aklysoft.fantasyf1.service.fantasy.definitions.FantasyDefinitionService;
+import com.aklysoft.fantasyf1.service.fantasy.drivers.FantasyDriverService;
 import com.aklysoft.fantasyf1.service.fantasy.teams.FantasyTeamService;
 import com.aklysoft.fantasyf1.service.fantasy.teams.NewFantasyTeam;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructorService;
@@ -60,17 +62,22 @@ public class FantasyF1ServiceMain {
     private final OriginalRaceService originalRaceService;
     private final OriginalConstructorService originalConstructorService;
     private final OriginalDriverService originalDriverService;
+    private final FantasyDriverService fantasyDriverService;
+    private final FantasyConstructorService fantasyConstructorService;
     private final FantasyTeamService fantasyTeamService;
 
 
     public Startup(UserService userService, FantasyDefinitionService fantasyDefinitionService,
                    OriginalRaceService originalRaceService, OriginalConstructorService originalConstructorService,
-                   OriginalDriverService originalDriverService, FantasyTeamService fantasyTeamService) {
+                   OriginalDriverService originalDriverService, FantasyDriverService fantasyDriverService,
+                   FantasyConstructorService fantasyConstructorService, FantasyTeamService fantasyTeamService) {
       this.userService = userService;
       this.originalRaceService = originalRaceService;
       this.fantasyDefinitionService = fantasyDefinitionService;
       this.originalConstructorService = originalConstructorService;
       this.originalDriverService = originalDriverService;
+      this.fantasyDriverService = fantasyDriverService;
+      this.fantasyConstructorService = fantasyConstructorService;
       this.fantasyTeamService = fantasyTeamService;
     }
 
@@ -87,9 +94,16 @@ public class FantasyF1ServiceMain {
         final String series = "f1";
         final Integer season = fantasyDefinitionService.getCurrentSeason(series);
 
-        loadCurrentSeason(series, season);
+        loadSeason(series, season - 1);
+        loadSeason(series, season);
+        calculateInitialPrices(series, season);
         createTestFantasyTeam(series, season);
       }
+    }
+
+    private void calculateInitialPrices(String series, Integer season) {
+      fantasyDriverService.calculateInitialPrices(series, season);
+      fantasyConstructorService.calculateInitialPrices(series, season);
     }
 
     private void loadUsers() {
@@ -101,7 +115,7 @@ public class FantasyF1ServiceMain {
       userService.addUser("charlie", "charlie", "user");
     }
 
-    private void loadCurrentSeason(String series, int season) {
+    private void loadSeason(String series, int season) {
       originalRaceService.getRaces(series, season);
       originalConstructorService.getConstructors(series, season);
       originalDriverService.getDrivers(series, season);

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ModifyFantasyTeamMember {
+public class ModifyFantasyTeamMemberQuery {
 
   private FantasyTeamMemberCategoryType teamMemberTypeId;
 

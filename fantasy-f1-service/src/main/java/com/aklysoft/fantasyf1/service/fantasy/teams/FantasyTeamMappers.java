@@ -12,6 +12,8 @@ import static java.util.stream.Collectors.toList;
 
 public class FantasyTeamMappers {
 
+  private FantasyTeamMappers() {
+  }
 
   public static List<FantasyTeamViewItem> toFantasyTeamViewItem(List<FantasyTeam> fantasyTeams) {
     return toFantasyTeamViewItem(fantasyTeams.stream()).collect(toList());
@@ -24,8 +26,7 @@ public class FantasyTeamMappers {
 
     return toFantasyTeamViewItem(Stream.of(fantasyTeam))
             .findFirst()
-            .orElseThrow(() -> new ApiException("" +
-                    ""));
+            .orElseThrow(() -> new ApiException("This should not happen! Missing the transformed item!"));
   }
 
 
@@ -43,6 +44,7 @@ public class FantasyTeamMappers {
                                     Optional.ofNullable(fantasyTeam.getPlayer())
                                             .orElse(Player.builder().build())
                                             .getFullName())
+                            .money(fantasyTeam.getMoney())
                             .build()
             );
   }

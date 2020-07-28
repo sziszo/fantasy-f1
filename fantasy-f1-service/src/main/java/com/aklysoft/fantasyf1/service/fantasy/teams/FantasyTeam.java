@@ -32,6 +32,8 @@ public class FantasyTeam {
   @Column(unique = true)
   private String name;
 
+  private Long money;
+
   private String creator;
   private LocalDateTime created;
 

@@ -38,4 +38,40 @@ public class FantasyDefinitionRepositoryImpl extends GeneralRepositoryImpl<Fanta
             .setParameter(1, series)
             .getResultList();
   }
+
+  @Override
+  public Long getInitialMoney(String series, int season) {
+    try {
+      return entityManager.createQuery("select d.initialMoney from FantasyDefinition d where d.series = ?1 and d.season = ?2", Long.class)
+              .setParameter(1, series)
+              .setParameter(2, season)
+              .getSingleResult();
+    } catch (NoResultException ex) {
+      return null;
+    }
+  }
+
+  @Override
+  public Integer getInitialDriverPrice(String series, int season) {
+    try {
+      return entityManager.createQuery("select d.initialDriverPrice from FantasyDefinition d where d.series = ?1 and d.season = ?2", Integer.class)
+              .setParameter(1, series)
+              .setParameter(2, season)
+              .getSingleResult();
+    } catch (NoResultException ex) {
+      return null;
+    }
+  }
+
+  @Override
+  public Integer getInitialConstructorPrice(String series, int season) {
+    try {
+      return entityManager.createQuery("select d.initialConstructorPrice from FantasyDefinition d where d.series = ?1 and d.season = ?2", Integer.class)
+              .setParameter(1, series)
+              .setParameter(2, season)
+              .getSingleResult();
+    } catch (NoResultException ex) {
+      return null;
+    }
+  }
 }

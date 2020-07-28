@@ -61,6 +61,7 @@ public class OriginalConstructorMappers {
             .name(constructor.getName())
             .nationality(constructor.getNationality())
             .url(constructor.getUrl())
+            .price(constructor.getPrice())
             .build();
   }
 }

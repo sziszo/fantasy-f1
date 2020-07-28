@@ -1,6 +1,7 @@
 package com.aklysoft.fantasyf1.service.original.drivers;
 
 import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMember;
+import com.aklysoft.fantasyf1.service.fantasy.members.FantasyTeamMemberPriceItem;
 import com.aklysoft.fantasyf1.service.original.constructors.OriginalConstructor;
 import com.aklysoft.fantasyf1.service.original.results.OriginalRaceResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @IdClass(OriginalDriverPK.class)
-public class OriginalDriver {
+public class OriginalDriver implements FantasyTeamMemberPriceItem {
 
   @Id
   private String series;
@@ -44,6 +45,8 @@ public class OriginalDriver {
 
   private String constructorId;
 
+  private Long price;
+
   @ManyToOne
   @JoinColumns({
           @JoinColumn(name = "series", referencedColumnName = "series", insertable = false, updatable = false),
@@ -59,4 +62,10 @@ public class OriginalDriver {
   @JsonIgnore
   @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
   private List<FantasyTeamMember> fantasyTeamMembers;
+
+  @Transient
+  @Override
+  public String getDisplayName() {
+    return OriginalDriverMappers.getDriverDisplayName(this);
+  }
 }

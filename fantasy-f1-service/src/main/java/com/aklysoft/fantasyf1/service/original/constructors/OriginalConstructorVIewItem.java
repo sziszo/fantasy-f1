@@ -20,5 +20,6 @@ public class OriginalConstructorVIewItem {
   private String name;
   private String nationality;
   private String url;
+  private Long price;
 
 }

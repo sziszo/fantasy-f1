@@ -70,5 +70,23 @@ public class FantasyDefinitionService {
     return true;
   }
 
+  public Long getInitialMoney(String series, int season) {
+    validateFantasySeries(series);
+
+    return fantasyDefinitionRepository.getInitialMoney(series, season);
+  }
+
+  public Integer getInitialDriverPrice(String series, int season) {
+    validateFantasySeries(series);
+
+    return fantasyDefinitionRepository.getInitialDriverPrice(series, season);
+  }
+
+  public Integer getInitialConstructorPrice(String series, int season) {
+    validateFantasySeries(series);
+
+    return fantasyDefinitionRepository.getInitialConstructorPrice(series, season);
+  }
+
 
 }

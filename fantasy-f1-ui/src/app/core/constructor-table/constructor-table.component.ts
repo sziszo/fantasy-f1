@@ -21,7 +21,7 @@ export class ConstructorTableComponent implements AfterViewInit, OnInit, OnDestr
   dataSource: ConstructorTableDataSource;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['name', 'nationality', 'actions'];
+  displayedColumns = ['name', 'nationality', 'price', 'actions'];
 
   private unsubscribe$ = new Subject<void>();
 

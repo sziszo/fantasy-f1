@@ -15,5 +15,7 @@ public class FantasyTeamViewItem {
   private String series;
   private int season;
   private String name;
+  private Long money;
   private String playerDisplayName;
+
 }

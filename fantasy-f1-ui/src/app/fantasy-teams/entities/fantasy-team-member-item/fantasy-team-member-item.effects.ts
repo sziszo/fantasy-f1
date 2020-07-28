@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as FantasyTeamMemberActions from "./fantasy-team-member-item.actions";
-import { catchError, concatMap, map } from "rxjs/operators";
+import * as FantasyTeamActions from "../fantasy-team-item/fantasy-team-item.actions";
+import { catchError, concatMap, map, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
 import { FantasyTeamMemberItemService } from "./fantasy-team-member-item.service";
 
@@ -24,9 +25,13 @@ export class FantasyTeamMemberItemEffects {
     return this.actions$.pipe(
       ofType(FantasyTeamMemberActions.setMyFantasyTeamMemberItem),
       concatMap(({series, season, id, teamMemberCategoryType}) =>
-        this.fantasyTeamMemberItemService.setMyFantasyTeamMemberItem(series, season, id, teamMemberCategoryType).pipe(
-          map(data => FantasyTeamMemberActions.setMyFantasyTeamMemberItemSuccess({data})),
-          catchError(error => of(FantasyTeamMemberActions.setMyFantasyTeamMemberItemFailure({error}))))
+        this.fantasyTeamMemberItemService.setMyFantasyTeamMemberItem(series, season, id, teamMemberCategoryType)
+          .pipe(
+            switchMap(data => [
+              FantasyTeamMemberActions.setMyFantasyTeamMemberItemSuccess({data: data.fantasyTeamMemberItem}),
+              FantasyTeamActions.upsertFantasyTeamItem({fantasyTeamItem: data.fantasyTeamItem})
+            ]),
+            catchError(error => of(FantasyTeamMemberActions.setMyFantasyTeamMemberItemFailure({error}))))
       )
     );
   });
@@ -35,9 +40,13 @@ export class FantasyTeamMemberItemEffects {
     return this.actions$.pipe(
       ofType(FantasyTeamMemberActions.deleteMyFantasyTeamMemberItem),
       concatMap(({series, season, teamMemberCategoryType}) =>
-        this.fantasyTeamMemberItemService.deleteMyFantasyTeamMemberItem(series, season, teamMemberCategoryType).pipe(
-          map(data => FantasyTeamMemberActions.deleteMyFantasyTeamMemberItemSuccess({data})),
-          catchError(error => of(FantasyTeamMemberActions.deleteMyFantasyTeamMemberItemFailure({error}))))
+        this.fantasyTeamMemberItemService.deleteMyFantasyTeamMemberItem(series, season, teamMemberCategoryType)
+          .pipe(
+            switchMap(data => [
+              FantasyTeamMemberActions.deleteMyFantasyTeamMemberItemSuccess({data: data.fantasyTeamMemberItem}),
+              FantasyTeamActions.upsertFantasyTeamItem({fantasyTeamItem: data.fantasyTeamItem})
+            ]),
+            catchError(error => of(FantasyTeamMemberActions.deleteMyFantasyTeamMemberItemFailure({error}))))
       )
     );
   });
